@@ -1,0 +1,333 @@
+---
+title: "Calibrate and validate hydrological models"
+author: "Michael Schirmer"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+# output: pdf_document
+vignette: >
+  %\VignetteIndexEntry{Calibrate and validate hydrological models}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## User settings
+
+```{r}
+library(tictoc)
+
+# setwd("D:/ensemblehydromodel")
+# source("R/functions_and_settings.R")
+
+library(ensemblehydromodel)
+
+
+setwd("D:/future_water_model")
+
+
+# Settings ---------------------------------
+# catchment settings
+main_basin <- "Thur"
+HSU_ID <- "2044"
+
+# data settings
+# source_data_type_list <- c("rhiresd_tabsd", "prevah_grids")
+source_data_type_list <- c("rhiresd_tabsd")
+raster_name <- "dhm_25_l2"
+
+# model settings
+model_list = c("CemaNeigeGR4J", "CemaNeigeGR5J", "CemaNeigeGR6J", "TUW")
+# model_list = c("CemaNeigeGR4J", "CemaNeigeGR5J", "CemaNeigeGR6J")
+
+
+# use default calibration parameters
+cal_par <- default_cal_par
+# for fast testing
+# cal_par$CemaNeigeGR4J$DEoptim$itermax <- 10
+
+
+# calibration settings
+error_crit_transfo_list <- c("KGE_none", "KGE_sqrt", "KGE_inv")
+cal_maximize <- TRUE
+cal_fn_list <- c("Calibration_Michel", "DEoptim", "malschains", "hydroPSO")
+# if parameter space should be transformed during calibration
+do_transfo_param <- TRUE
+
+
+# validation settings
+val_crit_transfo <- c("KGE_none", "NSE_none", "VE_none", "pbias_none",
+                      "KGE_inv",  "NSE_inv",
+                      "KGE_sqrt", "NSE_sqrt")
+
+# a list with names and arrays of two digits describing months used to calculate
+# subseasonal validation metrics
+val_subseason <- list(spring = c("02", "03", "04", "05"), 
+                      summer = c("06", "07", "08", "09")) 
+# for no subseasonal values take
+# val_subseason <- list()
+
+
+
+```
+
+## functions
+
+
+```{r}
+
+# tic toc message
+msg_toc <- function(tic, toc, msg, info1, info2) {
+  outmsg <- paste0(info1, " > ", msg, " > ", round(toc - tic, 3), " seconds elapsed ", info2)
+}
+
+# wrapper function, todo exclude this from package and put this to future_water_model
+calibrate_validate <- function(model, main_basin, HSU_ID, raster_name, source_data_type,
+                               error_crit_transfo, cal_maximize, cal_fn,
+                               do_transfo_param = FALSE, cal_parameters = cal_par,
+                               val_crit_transfo = "KGE_none", val_subseason = list()) {
+
+  # calibrate and validate on main catchment -----------------------------------
+
+  # load meteo and spatial data
+  hydro_data <- list()
+  hydro_data$BasinObs <- load_meteo_data(file.path(
+    "data", main_basin, "input", "airGR",
+    source_data_type, paste0("HSU_", HSU_ID, ".rds")
+  ))
+
+  hydro_data$BasinInfo <- readr::read_rds(file.path(
+    "data", main_basin, "input", "airGR",
+    "basin_info", paste0("BasinInfo_", HSU_ID, "_", raster_name, ".rds")
+  ))
+
+  # create input dependent on model
+  input <- create_input(model, hydro_data$BasinObs, hydro_data$BasinInfo)
+
+  # split data set
+  split_indices <- split_data_set(
+    hydro_data$BasinObs$DatesR,
+    c("1981-01-01", "1982-12-31", "1983-01-01", "2000-12-31", "2001-01-01", "2020-12-31")
+  )
+
+  # start time measuring for calibration
+  tic(msg = paste(model, cal_fn, source_data_type), quiet = TRUE)
+
+  # calibrate model
+  calibration_results <- calibrate_model(
+    hydro_data, split_indices, model, input, error_crit_transfo, cal_maximize,
+    cal_fn, do_transfo_param, cal_par
+  )
+
+
+  # this line provides an console output
+  mytoc <- toc(func.toc = msg_toc, info1 = Sys.time(), info2 = "for calibration")
+  # this lines write to file
+  write(msg_toc(mytoc$tic, mytoc$toc, mytoc$msg, info1 = Sys.time(), info2 = "for calibration"),
+    file = "testlog.txt", append = TRUE
+  )
+
+
+  #  this handles the case the calibration results is not available
+  if (!is.null(calibration_results)) {
+
+    # simulate for all available data
+    simulation_results <- simulate_model(model, calibration_results$model_param, input)
+
+    # observed runoff
+    Qobs <- hydro_data$BasinObs$Qmm
+
+    # calculate performance metrics for calibration period
+    perf_cal <- calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs$DatesR,
+      split_indices$ind_cal, "calibration",
+      col_name = "period",
+      simulation_results$Qsim, Qobs, val_crit_transfo
+    )
+
+    # calculate performance metrics for calibration period
+    perf_val <- calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs$DatesR,
+      split_indices$ind_val, "validation",
+      col_name = "period",
+      simulation_results$Qsim, Qobs, val_crit_transfo
+    )
+
+    # combine periods in one data frame
+    validation_results <- dplyr::bind_rows(perf_cal, perf_val)
+
+
+    # write ascii results overview
+    file_basename <- paste0("HSU_", HSU_ID)
+    base_folder <- file.path(
+      "data", main_basin, "results", model, cal_fn, error_crit_transfo,
+      source_data_type
+    )
+    ascii_folder <- file.path(base_folder, "ascii")
+    dir.create(ascii_folder, recursive = TRUE, showWarnings = FALSE)
+
+    write_ascii(
+      file.path(ascii_folder, paste0(file_basename, ".txt")),
+      calibration_results, validation_results
+    )
+
+    # save calibration validation plot
+    figure_folder <- file.path(base_folder, "figures")
+    dir.create(figure_folder, recursive = TRUE, showWarnings = FALSE)
+
+    save_cal_val_plot(
+      file.path(figure_folder, paste0(file_basename, "_cal_val.pdf")),
+      hydro_data$BasinObs, simulation_results$Qsim, split_indices
+    )
+
+    # save airGR plot
+    save_airGR_plot(
+      file.path(figure_folder, paste0(file_basename, "_airGR.pdf")),
+      simulation_results, Qobs
+    )
+
+    # save binary results
+    # todo include calibration parameters
+    binary_folder <- file.path(base_folder, "binary")
+    dir.create(binary_folder, recursive = TRUE, showWarnings = FALSE)
+    readr::write_rds(
+      list(
+        calibration = calibration_results,
+        simulation = simulation_results,
+        validation = validation_results
+      ),
+      file.path(binary_folder, paste0(file_basename, ".rds"))
+    )
+
+
+    # validate models on subcatchments ---------------------------------------
+    # todo at at the moment only data for airGR is read
+    input_folder <- file.path("data", main_basin, "input", "airGR", source_data_type)
+    sub_HSU_IDs <- readr::parse_number(list.files(input_folder))
+    names(sub_HSU_IDs) <- sub_HSU_IDs
+
+    # load subcatchment data
+    meteo_files <- file.path(
+      "data", main_basin, "input", "airGR",
+      source_data_type, paste0("HSU_", sub_HSU_IDs, ".rds")
+    )
+    names(meteo_files) <- sub_HSU_IDs
+    spatial_files <- file.path(
+      "data", main_basin, "input", "airGR",
+      "basin_info", paste0("BasinInfo_", sub_HSU_IDs, "_", raster_name, ".rds")
+    )
+    names(spatial_files) <- sub_HSU_IDs
+
+    # load observational and catchment specific data
+    hydro_data <- list()
+    hydro_data$BasinObs <- purrr::map(meteo_files, load_meteo_data)
+    hydro_data$BasinInfo <- purrr::map(spatial_files, readr::read_rds)
+
+    # create input dependent on model
+    input <- purrr::map2(hydro_data$BasinObs, hydro_data$BasinInfo, ~ create_input(model, .x, .y))
+
+    # simulate model for all data available
+    simulation_results <- purrr::map(input, ~ simulate_model(model, calibration_results$model_param, .x))
+
+    # loop over all subbasins
+    Qobs <- purrr::map(hydro_data$BasinObs, ~ .x$Qmm)
+
+    # calculate performance metrics for calibration period
+    perf_cal <- purrr::map2(
+      simulation_results, Qobs,
+      ~ calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs[[1]]$DatesR,
+        split_indices$ind_cal, "calibration",
+        col_name = "period",
+        .x$Qsim, .y, val_crit_transfo
+      )
+    )
+
+    # calculate performance metrics for validation period
+    perf_val <- purrr::map2(
+      simulation_results, Qobs,
+      ~ calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs[[1]]$DatesR,
+        split_indices$ind_val, "validation",
+        col_name = "period",
+        .x$Qsim, .y, val_crit_transfo
+      )
+    )
+
+    # combine periods in one data frame
+    validation_results <- purrr::map2(perf_cal, perf_val, dplyr::bind_rows)
+
+    # output overview ascii
+    # file, calibration_results, validation_results, equally_spaced = TRUE
+    file_basename <- purrr::map(sub_HSU_IDs, ~ paste0("HSU_", .x))
+    purrr::walk2(file_basename, validation_results, ~ write_ascii(
+      file.path(ascii_folder, paste0(.x, ".txt")),
+      calibration_results, .y
+    ))
+
+    # save calibration validation plot
+    save_cal_val_plot_fun <- function(a, b, c) {
+      save_cal_val_plot(
+        file.path(figure_folder, paste0(a, "_cal_val.pdf")),
+        b, c$Qsim, split_indices
+      )
+    }
+    purrr::pwalk(list(file_basename, hydro_data$BasinObs, simulation_results), save_cal_val_plot_fun)
+
+
+    # save airGR plots
+    save_airGR_plot_fun <- function(a, b, c) {
+      save_airGR_plot(
+        file.path(figure_folder, paste0(a, "_airGR.pdf")), b, c
+      )
+    }
+    purrr::pwalk(list(file_basename, simulation_results, Qobs), save_airGR_plot_fun)
+
+    # save binary results
+    save_bin_fun <- function(a, b, c) {
+      readr::write_rds(
+        list(
+          calibration = calibration_results,
+          simulation = b,
+          validation = c
+        ),
+        file.path(binary_folder, paste0(a, ".rds"))
+      )
+    }
+    purrr::pwalk(list(file_basename, simulation_results, validation_results), save_bin_fun)
+  }
+}
+```
+
+
+## loop over all settings
+
+
+```{r, eval=FALSE}
+
+
+for (i in seq_along(source_data_type_list)){
+  for (j in seq_along(cal_fn_list)){
+    for (k in seq_along(model_list)){
+      for (m in seq_along(error_crit_transfo_list)) {
+        error_crit_transfo <- error_crit_transfo_list[m]
+        model <- model_list[k]
+        cal_fn <- cal_fn_list[j]
+        source_data_type <- source_data_type_list[i]
+        
+        cat(sprintf("%s > Start with %s and %s for model %s with target %s ...\n", 
+                    Sys.time(), source_data_type, cal_fn, model, error_crit_transfo))
+        
+        suppressMessages(calibrate_validate(model, main_basin, HSU_ID, raster_name, source_data_type,
+                                            error_crit_transfo, cal_maximize, cal_fn,
+                                            do_transfo_param, cal_par,
+                                            val_crit_transfo, val_subseason))
+      }
+    }
+  }
+}
+```
+

@@ -1,0 +1,11 @@
+Package: openQuarrel
+Title: A R meta-package for hydrological modelling
+Version: 1.0.0
+Authors@R: Michael Schirmer
+Description: A R meta-package for hydrological modelling. Includes calibration option, and validation metrics and plots.
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: magrittr, airGR, hydroGOF 
