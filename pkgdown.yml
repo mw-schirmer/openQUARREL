@@ -5,7 +5,7 @@ articles:
   calibrate_validate: calibrate_validate.html
   include_snow_module: include_snow_module.html
   run_model_minimalistic: run_model_minimalistic.html
-last_built: 2025-08-11T13:13Z
+last_built: 2025-08-11T14:26Z
 urls:
   reference: https://mw-schirmer.github.io/openQUARREL/reference
   article: https://mw-schirmer.github.io/openQUARREL/articles
