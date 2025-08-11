@@ -1,10 +1,4 @@
-url: ~
+url: https://mw-schirmer.github.io/openQUARREL/
 template:
   bootstrap: 5
-articles:
-- title: Articles
-  navbar: ~
-  contents:
-  - run_model_minimalistic
-  - include_snow_module
-  - calibrate_validate
+

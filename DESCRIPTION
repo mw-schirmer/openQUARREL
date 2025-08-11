@@ -36,3 +36,4 @@ Suggests:
     rmarkdown
 Remotes: JosephGuillaume/hydromad@oldstable, hzambran/hydroPSO 
 VignetteBuilder: knitr
+URL: https://mw-schirmer.github.io/openQUARREL/
