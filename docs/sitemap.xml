@@ -1,120 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/404.html</loc>
   </url>
   <url>
-    <loc>/articles/calibrate_validate.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/articles/calibrate_validate.html</loc>
   </url>
   <url>
-    <loc>/articles/include_snow_module.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/articles/include_snow_module.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/run_model_minimalistic.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/articles/run_model_minimalistic.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/index.html</loc>
   </url>
   <url>
-    <loc>/reference/calc_crit.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/calc_crit.html</loc>
   </url>
   <url>
-    <loc>/reference/calc_hydroGOF.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/calc_hydroGOF.html</loc>
   </url>
   <url>
-    <loc>/reference/calc_subseasonal_validation_results.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/calc_subseasonal_validation_results.html</loc>
   </url>
   <url>
-    <loc>/reference/calc_validation_results.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/calc_validation_results.html</loc>
   </url>
   <url>
-    <loc>/reference/calibrate_model.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/calibrate_model.html</loc>
   </url>
   <url>
-    <loc>/reference/call_cal_fn.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/call_cal_fn.html</loc>
   </url>
   <url>
-    <loc>/reference/create_hydromad_model.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/create_hydromad_model.html</loc>
   </url>
   <url>
-    <loc>/reference/create_input.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/create_input.html</loc>
   </url>
   <url>
-    <loc>/reference/default_cal_par.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/default_cal_par.html</loc>
   </url>
   <url>
-    <loc>/reference/find_monthly_indices.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/find_monthly_indices.html</loc>
   </url>
   <url>
-    <loc>/reference/get_family.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/get_family.html</loc>
   </url>
   <url>
-    <loc>/reference/hydro_family.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/hydro_family.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/input_data.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/input_data.html</loc>
   </url>
   <url>
-    <loc>/reference/KGEtang.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/KGEtang.html</loc>
   </url>
   <url>
-    <loc>/reference/load_meteo_data.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/load_meteo_data.html</loc>
   </url>
   <url>
-    <loc>/reference/merge_snow_runoff_sim.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/merge_snow_runoff_sim.html</loc>
   </url>
   <url>
-    <loc>/reference/norm_minmax.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/norm_minmax.html</loc>
   </url>
   <url>
-    <loc>/reference/optim_fn.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/optim_fn.html</loc>
   </url>
   <url>
-    <loc>/reference/save_airGR_plot.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/save_airGR_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/save_cal_val_plot.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/save_cal_val_plot.html</loc>
   </url>
   <url>
-    <loc>/reference/set_airGR_par.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/set_airGR_par.html</loc>
   </url>
   <url>
-    <loc>/reference/set_cal_par.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/set_cal_par.html</loc>
   </url>
   <url>
-    <loc>/reference/set_hydromad_par.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/set_hydromad_par.html</loc>
   </url>
   <url>
-    <loc>/reference/simulate_model.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/simulate_model.html</loc>
   </url>
   <url>
-    <loc>/reference/simulate_snow.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/simulate_snow.html</loc>
   </url>
   <url>
-    <loc>/reference/split_data_set.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/split_data_set.html</loc>
   </url>
   <url>
-    <loc>/reference/subset_simulations.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/subset_simulations.html</loc>
   </url>
   <url>
-    <loc>/reference/transfo_param.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/transfo_param.html</loc>
   </url>
   <url>
-    <loc>/reference/transfo_q.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/transfo_q.html</loc>
   </url>
   <url>
-    <loc>/reference/validate_model.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/validate_model.html</loc>
   </url>
   <url>
-    <loc>/reference/write_ascii.html</loc>
+    <loc>https://mw-schirmer.github.io/openQUARREL/reference/write_ascii.html</loc>
   </url>
 </urlset>
