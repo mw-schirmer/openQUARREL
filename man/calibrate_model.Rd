@@ -2,14 +2,17 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{calibrate_model}
 \alias{calibrate_model}
-\title{Model calibration}
+\title{Calibrate a Hydrological Model}
 \usage{
 calibrate_model(
   hydro_data,
   split_indices,
   model,
   input,
-  error_crit_transfo = "KGE_none",
+  snow_module = NULL,
+  snow_input = NULL,
+  snow_parameters = NULL,
+  error_crit_transfo = "KGE__none",
   cal_maximize = TRUE,
   cal_fn = "DEoptim",
   do_transfo_param = FALSE,
@@ -17,69 +20,83 @@ calibrate_model(
 )
 }
 \arguments{
-\item{split_indices}{a list of indices from \code{\link{split_data_set}}
-containing the elements \code{ind_cal} and \code{ind_warm}}
+\item{hydro_data}{A list or data frame containing observed runoff and meteorological data,
+typically loaded using \code{\link{load_meteo_data}}.}
 
-\item{model}{a string specifying the hydrological model, currently
-implemented are airGR and TUWmodel package models}
+\item{split_indices}{A list of index vectors (e.g., from \code{\link{split_data_set}})
+indicating warm-up and calibration periods.}
 
-\item{input}{the output of the \code{create_input} function, dependent on the
-model choice, in general containing information about date, precipitation
-air temperature and potential evapotranspiration and spatial information as
-area of the catchment or hypsometric curves}
+\item{model}{A string specifying the hydrological model to calibrate.}
 
-\item{error_crit_transfo}{string specifying the error criterion for
-calibration and the runoff transformation separated by a \code{"_"}
-supported are validation criteria from the \code{\link{hydroGOF}} package
-usable by the \code{\link{calc_hydroGOF}} function, for supported runoff
-transformations please refer to \code{\link{transfo_q}}}
+\item{input}{A list of model input data, typically created using \code{\link{create_input}}.}
 
-\item{cal_maximize}{a logical indicating if the calibration
-error criterion should be maximized (or minimized)}
+\item{snow_module}{Optional. A string specifying the snow module (e.g., \code{"CemaNeige"}).}
 
-\item{cal_fn}{a string specifying optimization algorithm to be used
-for the model calibration Currently \code{\link[airGR]{Calibration_Michel}}
-is implemented for \code{\link{airGR}} models, and \code{\link{DEoptim}} ,
-\code{\link{hydroPSO}} and \code{\link{malschains}} are supported for all
-models.}
+\item{snow_input}{Optional. Input data for the snow module.}
 
-\item{do_transfo_param}{logical indicating if parameter transformation to a
-hypercube should be applied during calibration}
+\item{snow_parameters}{Optional. A vector of fixed snow parameters. If \code{NULL},
+snow parameters are assumed to be part of the calibration.}
 
-\item{cal_par}{a list of calibration settings dependent on the calibration
-function. Package default values \code{default_cal_par} can be overwritten
-by users.}
+\item{error_crit_transfo}{A string combining the error criterion and runoff transformation,
+separated by \code{"__"} (e.g., \code{"KGE__none"}). Optionally, a third value (e.g., lambda)
+can be included for transformations like Box-Cox.}
 
-\item{BasinObs}{data frame with time series of input data from
-\code{\link{load_meteo_data}}}
+\item{cal_maximize}{Logical. If \code{TRUE}, the calibration maximizes the objective function.}
+
+\item{cal_fn}{A string specifying the calibration function. Supported options include
+\code{"Calibration_Michel"} (for \pkg{airGR} models), \code{"DEoptim"}, \code{"hydroPSO"},
+\code{"malschains"}, and other supported optimizers.}
+
+\item{do_transfo_param}{Logical. If \code{TRUE}, parameters are transformed to a unit hypercube
+before calibration.}
+
+\item{cal_par}{A list of calibration settings specific to the chosen calibration function.
+Defaults to \code{default_cal_par}, but can be customized by the user.}
 }
 \value{
-a list of calibration results with elements called
+A list containing:
 \itemize{
-\item \code{model_param} a vector of calibrated model parameters,
-\item \code{error_crit_transfo} the error criterion and transformation used,
-\item \code{error_crit_val} the value of the error criterion,
-\item \code{more info} calibration function and model specific output
-information.
+\item \code{model_param}: Calibrated model parameters.
+\item \code{error_crit_transfo}: The error criterion and transformation used.
+\item \code{error_crit_val}: The final value of the error criterion.
+\item \code{cal_fn}: The calibration function used.
+\item \code{do_transfo_param}: Whether parameter transformation was applied.
+\item \code{duration}: Duration of the calibration process.
+\item \code{cal_par}: Calibration settings used.
+\item \code{more_info}: Additional model- or method-specific output.
 }
 }
 \description{
-Calibrates a hydrological model
+Performs calibration of a hydrological model using a specified optimization algorithm.
+Supports models from the \pkg{airGR}, \pkg{TUWmodel}, \pkg{hydromad}, and \pkg{topmodel}
+packages, with optional snow module integration. The function supports both native
+calibration routines (e.g., \code{Calibration_Michel} for \pkg{airGR}) and general-purpose
+optimizers (e.g., \code{DEoptim}, \code{hydroPSO}, \code{malschains}).
 }
 \note{
-Calibration_Michel does not call \code{\link{optim_fn}}, this is why
-the large list of otherwise global variables is still required as input
-todo: 1) check if some input is really needed for Calibration_Michel as
-e.g. BasinObs
-2) think about how to easily access and change cal_par values for
-end user
+\itemize{
+\item \code{Calibration_Michel} is only available for \pkg{airGR} models.
+\item If \code{Calibration_Michel} is used, parameters are assumed to be transformed.
+\item The function supports power and Box-Cox runoff transformations, with lambda optionally specified.
+\item Future improvements may simplify access to \code{cal_par} for end users.
+}
 }
 \examples{
+\dontrun{
 calibration_results <- calibrate_model(
-  hydro_data, split_indices, model, input, error_crit_transfo, cal_maximize,
-  cal_fn, do_transfo_param, cal_par
+  hydro_data = hydro_data,
+  split_indices = split_data_set(...),
+  model = "GR4J",
+  input = create_input(...),
+  error_crit_transfo = "KGE__none",
+  cal_maximize = TRUE,
+  cal_fn = "DEoptim",
+  do_transfo_param = TRUE,
+  cal_par = default_cal_par
 )
 }
+}
 \seealso{
-\code{\link{call_cal_fn}}, \code{\link{optim_fn}}
+\code{\link{call_cal_fn}}, \code{\link{optim_fn}}, \code{\link{create_input}},
+\code{\link{load_meteo_data}}, \code{\link{split_data_set}}, \code{\link{transfo_q}}
 }

@@ -2,28 +2,54 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{split_data_set}
 \alias{split_data_set}
-\title{split a date vector}
+\title{Split a Date Vector into Warm-up, Calibration, and Validation Periods}
 \usage{
-split_data_set(date, start_end_date_vec)
+split_data_set(
+  df,
+  start_end_date_vec,
+  ensure_warm_up = TRUE,
+  adjust_cal_end = FALSE,
+  adjust_val_start = FALSE
+)
 }
 \arguments{
-\item{date}{a vector of dates (e.g. Dates, Posix)}
+\item{df}{A vector of dates (e.g., \code{Date}, \code{POSIXt}) or a data frame containing a
+\code{DatesR} column and a \code{Qmm} column (used to detect the first non-NA value).}
 
-\item{start_end_date_vec}{vector of length six, with entries start and end
-date for warm-up, start and end date for calibration and start and end date
-for validation, in this order.}
+\item{start_end_date_vec}{A character vector of length six, specifying the start
+and end dates for the warm-up, calibration, and validation periods, in that order.}
+
+\item{ensure_warm_up}{Logical. If \code{TRUE}, adjusts the warm-up period to start at
+the first non-NA value in \code{Qmm}, if applicable. Default is \code{TRUE}.}
+
+\item{adjust_cal_end}{Logical. If \code{TRUE}, the end date of the calibration period is adjusted
+proportionally to the shift in the warm-up period, preserving the original calibration-to-validation
+duration ratio. This ensures that the calibration period remains representative even if the warm-up
+period is shifted due to missing data.}
+
+\item{adjust_val_start}{Logical. If \code{TRUE}, the start date of the validation period is adjusted
+to immediately follow the (potentially shifted) calibration period. This ensures continuity between
+calibration and validation periods when the calibration end date has been modified.}
 }
 \value{
-a list with three vectors containing indices \code{ind_warm},
-\code{ind_cal}, \code{ind_val}
+A list with three elements:
+\describe{
+\item{ind_warm}{Indices corresponding to the warm-up period.}
+\item{ind_cal}{Indices corresponding to the calibration period.}
+\item{ind_val}{Indices corresponding to the validation period.}
+}
 }
 \description{
-Splits a date vector hardcoded into three time periods, i.e. warm up,
-calibration and validation period
+Splits a date vector or a data frame with a date column into three time periods:
+warm-up, calibration, and validation. The function allows for optional adjustment
+of the calibration and validation periods based on the presence of missing data
+at the beginning of the time series.
 }
 \examples{
-split_data_set(
-  seq(from = as.Date("1981-01-01"), to = as.Date("2020-12-31"), by = "days"),
-  c("1981-01-01", "1982-12-31", "1983-01-01", "2000-12-31", "2001-01-01", "2020-12-31")
-)
+\dontrun{
+dates <- seq(as.Date("2000-01-01"), as.Date("2010-12-31"), by = "month")
+df <- data.frame(DatesR = dates, Qmm = c(rep(NA, 12), runif(length(dates) - 12)))
+periods <- split_data_set(df, c("2000-01-01", "2002-12-31", "2003-01-01", "2006-12-31", "2007-01-01", "2010-12-31"))
+}
+
 }

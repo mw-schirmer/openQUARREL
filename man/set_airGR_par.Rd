@@ -2,19 +2,36 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{set_airGR_par}
 \alias{set_airGR_par}
-\title{Create default calibration settings for the airGR family}
+\title{Create Default Calibration Settings for airGR Models}
 \usage{
 set_airGR_par(model)
 }
 \arguments{
-\item{model}{a model string}
+\item{model}{A string specifying the airGR model (e.g., \code{"GR4J"}, \code{"CemaNeigeGR4J"}).}
 }
 \value{
-a list of calibration settings
+A list containing:
+\itemize{
+\item \code{lower}, \code{upper} – numeric vectors of parameter bounds.
+\item \code{nof_param} – number of parameters.
+\item \code{DEoptim}, \code{malschains}, \code{hydroPSO} – optimizer settings.
+\item \code{has_snow_module} – logical indicating whether the model includes a snow module.
+}
 }
 \description{
-Create default calibration settings for the airGR family
+Generates a list of default calibration settings for a specified model from the airGR family.
+This includes parameter bounds and optimizer configurations for DEoptim, malschains, and hydroPSO.
+}
+\details{
+The function uses \code{\link[airGR]{CreateCalibOptions}} to extract parameter bounds and sets
+default configurations for several optimizers. It also detects whether the model includes a snow
+module based on the model name.
+}
+\note{
+This function only supports models from the airGR family. An error is thrown otherwise.
 }
 \examples{
 set_airGR_par("GR4J")
+set_airGR_par("CemaNeigeGR4J")
+
 }

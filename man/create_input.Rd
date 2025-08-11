@@ -2,24 +2,42 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{create_input}
 \alias{create_input}
-\title{Create model input}
+\title{Create Model Input Structure}
 \usage{
 create_input(model, BasinObs, BasinInfo)
 }
 \arguments{
-\item{model}{a string indicating a hydrological model}
+\item{model}{A string specifying the hydrological model (e.g., \code{"GR4J"}, \code{"TUW"}, \code{"topmodel"}).}
 
-\item{BasinObs}{data frame with time series of input data from
-\code{\link{load_meteo_data}}}
+\item{BasinObs}{A data frame containing time series of meteorological and hydrological data,
+typically created using \code{\link{load_meteo_data}}.}
 
-\item{BasinInfo}{a list with spatial basin information}
+\item{BasinInfo}{A list containing spatial and catchment-specific information such as
+\code{HypsoData}, \code{delay}, or \code{topidx}, depending on the model.}
 }
 \value{
-model a string specifying the hydrological model
+A model-specific input object, either a data frame, list, or S3 class, depending on the model type.
 }
 \description{
-Create input structure dependent on hydrological model choice
+Creates an input structure tailored to the specified hydrological model.
+The function supports models from the \pkg{airGR}, \pkg{TUWmodel}, \pkg{hydromad},
+and \pkg{topmodel} packages. The structure and content of the input depend on the
+model's requirements.
+}
+\details{
+\itemize{
+\item For \code{airGR} models, the function returns an object created by \code{airGR::CreateInputsModel()}.
+\item For \code{TUW}, \code{TUWsnow}, \code{snowsnow}, and \code{hydromad} models, a renamed data frame is returned.
+\item For \code{topmodel}, a list is returned including additional elements like \code{delay} and \code{topidx}.
+}
 }
 \examples{
-create_input("TUW", BasinObs, BasinInfo)
+\dontrun{
+BasinObs <- load_meteo_data("D:/input/airGR/HSU_2044.rds")
+BasinInfo <- list(HypsoData = c(500, 600, 700), delay = 2, topidx = runif(10))
+input <- create_input("GR4J", BasinObs, BasinInfo)
+}
+}
+\seealso{
+\code{\link{load_meteo_data}}, \code{\link{get_family}}, \code{airGR::CreateInputsModel()}
 }

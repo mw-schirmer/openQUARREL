@@ -23,9 +23,13 @@ transformed runoff in same format as input
 \description{
 Calculates Goodness-of-Fit functions for two runoff series
 }
+\note{
+This function requires the \code{hydroGOF} package to be installed. Not
+imported as this package depends on deprecated packages as sp etc.
+}
 \examples{
-# for the first example the function KGE must be loaded,
-#  for example with library(hydroGOF)
+# hydroGOF must be loaded
+library(hydroGOF)
 calc_hydroGOF(KGE, 1:10, seq(0, 9))
 # this is NA
 calc_hydroGOF("KGE", 1:10, rep(0, 10))

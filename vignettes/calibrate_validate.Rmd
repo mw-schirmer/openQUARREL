@@ -21,51 +21,48 @@ knitr::opts_chunk$set(
 
 ## User settings
 
-```{r}
+```{r, eval=FALSE}
+library(openQUARREL)
+library(dplyr) # check if this is needed after loading my pacckage
 library(tictoc)
-
-# setwd("D:/ensemblehydromodel")
-# source("R/functions_and_settings.R")
-
-library(ensemblehydromodel)
-
-
-setwd("D:/future_water_model")
-
+library(hydroGOF)
 
 # Settings ---------------------------------
-# catchment settings
-main_basin <- "Thur"
-HSU_ID <- "2044"
 
-# data settings
-# source_data_type_list <- c("rhiresd_tabsd", "prevah_grids")
-source_data_type_list <- c("rhiresd_tabsd")
-raster_name <- "dhm_25_l2"
+# set and create base directory for output, choose an appropriate folder
+base_folder <- "C:/openQuarrel/vignette"
+dir.create(base_folder, recursive = TRUE, showWarnings = FALSE)
+setwd(base_folder)
+
+# catchment settings
+HSU_ID <- "2303"
+
+# use default calibration settings
+cal_par <- default_cal_par
 
 # model settings
-model_list = c("CemaNeigeGR4J", "CemaNeigeGR5J", "CemaNeigeGR6J", "TUW")
-# model_list = c("CemaNeigeGR4J", "CemaNeigeGR5J", "CemaNeigeGR6J")
-
-
-# use default calibration parameters
-cal_par <- default_cal_par
-# for fast testing
-# cal_par$CemaNeigeGR4J$DEoptim$itermax <- 10
-
+# model_list = c("CemaNeigeGR4J", "CemaNeigeGR5J", "CemaNeigeGR6J", "TUW")
+model_list = c("TUW")
 
 # calibration settings
-error_crit_transfo_list <- c("KGE_none", "KGE_sqrt", "KGE_inv")
+# todo: call it cal_crit_transfo_vec, and elsewhere also vec
+error_crit_transfo_list <- c("KGE__none")
+# error_crit_transfo_list <- c("KGE__none", "KGEtang__log","KGE__power__0.2", "KGE__power__-0.5", "KGE__boxcoxsantos")
 cal_maximize <- TRUE
-cal_fn_list <- c("Calibration_Michel", "DEoptim", "malschains", "hydroPSO")
+cal_fn_list <- c("steepest_descent")
+# these are all possible choices, not that Calibration_Michel can only by applied to airGR models
+# cal_fn_list <- c("Calibration_Michel", "steepest_descent", "montecarlo__random__1000", "montecarlo__lhs__1000", "montecarlo__sobol__1000",
+#                  "nlminb", "optim", "nlminb__random__100", "optim__random__100",
+#                  "DEoptim", "hydroPSO", "malschains")
 # if parameter space should be transformed during calibration
 do_transfo_param <- TRUE
 
-
 # validation settings
-val_crit_transfo <- c("KGE_none", "NSE_none", "VE_none", "pbias_none",
-                      "KGE_inv",  "NSE_inv",
-                      "KGE_sqrt", "NSE_sqrt")
+val_crit_transfo <- c("KGE__none", "NSE__none", "VE__none", "pbias__none", "mae__none", "mse__none",
+                      "KGE__power__0.2",  "NSE__power__0.2", "mae__power__0.2", "mse__power__0.2",
+                      "KGE__boxcoxsantos", "NSE__boxcoxsantos", "mae__boxcoxsantos", "mse__boxcoxsantos",
+                      "KGEtang__log", "NSE__log", "mae__log", "mse__log",
+                      "KGE__power__-0.5", "NSE__power__-0.5", "mae__power__-0.5", "mse__power__-0.5")
 
 # a list with names and arrays of two digits describing months used to calculate
 # subseasonal validation metrics
@@ -73,8 +70,6 @@ val_subseason <- list(spring = c("02", "03", "04", "05"),
                       summer = c("06", "07", "08", "09")) 
 # for no subseasonal values take
 # val_subseason <- list()
-
-
 
 ```
 
@@ -84,250 +79,234 @@ val_subseason <- list(spring = c("02", "03", "04", "05"),
 ```{r}
 
 # tic toc message
-msg_toc <- function(tic, toc, msg, info1, info2) {
-  outmsg <- paste0(info1, " > ", msg, " > ", round(toc - tic, 3), " seconds elapsed ", info2)
+msg_toc <- function(tic, toc, msg, info1, info2, info3) {
+  outmsg <- paste0(info1, " > ", msg, " > ", round(toc - tic, 3), " seconds elapsed ", info2, " with best crit: " , round(info3, 3))
 }
 
 # wrapper function, todo exclude this from package and put this to future_water_model
-calibrate_validate <- function(model, main_basin, HSU_ID, raster_name, source_data_type,
+# todo: adapt to different input
+calibrate_validate <- function(model, input_data, basin_data, HSU_ID, 
                                error_crit_transfo, cal_maximize, cal_fn,
                                do_transfo_param = FALSE, cal_parameters = cal_par,
-                               val_crit_transfo = "KGE_none", val_subseason = list()) {
+                               val_crit_transfo = "KGE_none", val_subseason = list(),
+                               snow_module = NULL, snow_parameters = NULL) {
 
+   
   # calibrate and validate on main catchment -----------------------------------
 
-  # load meteo and spatial data
+  # subset data
   hydro_data <- list()
-  hydro_data$BasinObs <- load_meteo_data(file.path(
-    "data", main_basin, "input", "airGR",
-    source_data_type, paste0("HSU_", HSU_ID, ".rds")
-  ))
-
-  hydro_data$BasinInfo <- readr::read_rds(file.path(
-    "data", main_basin, "input", "airGR",
-    "basin_info", paste0("BasinInfo_", HSU_ID, "_", raster_name, ".rds")
-  ))
-
+  hydro_data$BasinObs <- input_data %>% filter(FOEN_ID == HSU_ID)
+  hydro_data$BasinInfo <- basin_data[[HSU_ID]]
+  
+  # convert Date to POSIXct
+  # todo: put it into input_data already
+  hydro_data$BasinObs$DatesR <- as.POSIXct(hydro_data$BasinObs$DatesR)
+  attr(hydro_data$BasinObs$DatesR, "tzone") <- "UTC"
+  
   # create input dependent on model
   input <- create_input(model, hydro_data$BasinObs, hydro_data$BasinInfo)
 
   # split data set
   split_indices <- split_data_set(
-    hydro_data$BasinObs$DatesR,
+    hydro_data$BasinObs,
     c("1981-01-01", "1982-12-31", "1983-01-01", "2000-12-31", "2001-01-01", "2020-12-31")
   )
-
+  
   # start time measuring for calibration
-  tic(msg = paste(model, cal_fn, source_data_type), quiet = TRUE)
-
-  # calibrate model
+  tic(msg = paste(model, snow_module, cal_fn, error_crit_transfo), quiet = TRUE)
+  
+  # create snow module and input
+  if (!is.null(snow_module)) {
+    # create snow input
+    snow_input <- create_input(snow_module, hydro_data$BasinObs, hydro_data$BasinInfo)
+  }
+  
+  # todo: redundant meteo data, in hydro_data and in input, provide only BasinInfo if possible
   calibration_results <- calibrate_model(
-    hydro_data, split_indices, model, input, error_crit_transfo, cal_maximize,
+    hydro_data, split_indices, model, input,
+    snow_module, snow_input, snow_parameters,
+    error_crit_transfo, cal_maximize,
     cal_fn, do_transfo_param, cal_par
   )
-
-
-  # this line provides an console output
-  mytoc <- toc(func.toc = msg_toc, info1 = Sys.time(), info2 = "for calibration")
-  # this lines write to file
-  write(msg_toc(mytoc$tic, mytoc$toc, mytoc$msg, info1 = Sys.time(), info2 = "for calibration"),
-    file = "testlog.txt", append = TRUE
-  )
-
-
-  #  this handles the case the calibration results is not available
+  
+  
+  #  check if calibration results are available
   if (!is.null(calibration_results)) {
-
-    # simulate for all available data
-    simulation_results <- simulate_model(model, calibration_results$model_param, input)
-
+    
+    # write log file and to console, for all calibrations in this catchment -----------
+    # name the run, i.e. a combination of snow module and hydro module
+    model_comb <- ifelse(is.null(snow_module), model, paste0(snow_module, "__", model))
+    
+    # this line provides an console output
+    mytoc <- toc(func.toc = msg_toc, info1 = Sys.time(), info2 = "for calibration", info3 = calibration_results$error_crit_val)
+    # this lines write to file
+    write(msg_toc(mytoc$tic, mytoc$toc, mytoc$msg, info1 = Sys.time(), info2 = "for calibration", info3 = calibration_results$error_crit_val),
+          file = file.path(base_folder, paste0("log_", HSU_ID, ".txt")), append = TRUE
+    )
+ 
+    # save parameters --------------------------------
+    # create output folder for this specific calibration
+    output_folder <- file.path(
+      base_folder, HSU_ID, 
+      model_comb, cal_fn, error_crit_transfo
+    )
+    parameter_folder <- file.path(output_folder, "model_parameters")
+    dir.create(parameter_folder, recursive = TRUE, showWarnings = FALSE)
+    readr::write_rds(calibration_results$model_param,
+                     file.path(parameter_folder, paste0(HSU_ID, ".rds"))
+    )
+    
+    
+    # simulate whole period for plots and quality metrics  ------------------
+    # retrieve model param
+    runoff_param <- calibration_results$model_param
+    
+    # retrieve snow module param and update precipitation input
+    if (!is.null(snow_module)) {
+      
+      if (is.null(snow_parameters)) {
+        nof_param_snow <- cal_par[[snow_module]][["nof_param"]]
+        snow_param <- calibration_results$model_param[1:nof_param_snow]
+        # remaining runoff model parameters
+        runoff_param <- calibration_results$model_param[(nof_param_snow + 1):length(calibration_results$model_param)]
+      } else {
+        # add snow parameters for storing
+        calibration_results$model_param <- c(snow_parameters, calibration_results$model_param)
+      }
+      
+      # model solid precipitation
+      # ensure that P is present in input
+      if (!"P" %in% names(input)) stop("P is not an entry of a list like input")
+      snow_module_results <- simulate_snow(snow_module, snow_param, snow_input)
+      
+      # update precipitation with snow module surface water runoff
+      input$P <- snow_module_results$surface_water_runoff
+      
+    }
+    
     # observed runoff
     Qobs <- hydro_data$BasinObs$Qmm
-
+    
+    # now run model
+    simulation_results <- simulate_model(model, runoff_param, input, Qobs = Qobs)
+    
+    # merge snow module results with runoff results
+    if (!is.null(snow_module)) {
+      simulation_results <- merge_snow_runoff_sim(simulation_results, snow_module_results)
+    }
+    
+    # performance metrics -------------------------
+    validation_results <- NA # initialize
+    
     # calculate performance metrics for calibration period
     perf_cal <- calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs$DatesR,
-      split_indices$ind_cal, "calibration",
-      col_name = "period",
-      simulation_results$Qsim, Qobs, val_crit_transfo
+                                                    split_indices$ind_cal, "calibration",
+                                                    col_name = "period",
+                                                    simulation_results$Qsim, Qobs, val_crit_transfo
     )
-
+    
     # calculate performance metrics for calibration period
     perf_val <- calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs$DatesR,
-      split_indices$ind_val, "validation",
-      col_name = "period",
-      simulation_results$Qsim, Qobs, val_crit_transfo
+                                                    split_indices$ind_val, "validation",
+                                                    col_name = "period",
+                                                    simulation_results$Qsim, Qobs, val_crit_transfo
     )
-
+    
     # combine periods in one data frame
     validation_results <- dplyr::bind_rows(perf_cal, perf_val)
-
-
-    # write ascii results overview
-    file_basename <- paste0("HSU_", HSU_ID)
-    base_folder <- file.path(
-      "data", main_basin, "results", model, cal_fn, error_crit_transfo,
-      source_data_type
-    )
-    ascii_folder <- file.path(base_folder, "ascii")
-    dir.create(ascii_folder, recursive = TRUE, showWarnings = FALSE)
-
-    write_ascii(
-      file.path(ascii_folder, paste0(file_basename, ".txt")),
-      calibration_results, validation_results
-    )
-
-    # save calibration validation plot
-    figure_folder <- file.path(base_folder, "figures")
-    dir.create(figure_folder, recursive = TRUE, showWarnings = FALSE)
-
-    save_cal_val_plot(
-      file.path(figure_folder, paste0(file_basename, "_cal_val.pdf")),
-      hydro_data$BasinObs, simulation_results$Qsim, split_indices
-    )
-
-    # save airGR plot
-    save_airGR_plot(
-      file.path(figure_folder, paste0(file_basename, "_airGR.pdf")),
-      simulation_results, Qobs
-    )
-
+    
+    
+    # save all data ------------------------
+    ind_list <- list()
+    ind_list$cal <- split_indices$ind_cal
+    ind_list$val <- split_indices$ind_val
+    
+    # split results in calibration and validation period
+    simulation_results_list <- purrr::map(ind_list, ~ subset_simulations(.x, simulation_results))
+    
     # save binary results
-    # todo include calibration parameters
-    binary_folder <- file.path(base_folder, "binary")
+    binary_folder <- file.path(output_folder, "binary")
     dir.create(binary_folder, recursive = TRUE, showWarnings = FALSE)
     readr::write_rds(
       list(
         calibration = calibration_results,
-        simulation = simulation_results,
+        simulation_val = simulation_results_list$val,
+        simulation_cal = simulation_results_list$cal,
+        sim_more_info = simulation_results$more_info,
         validation = validation_results
       ),
-      file.path(binary_folder, paste0(file_basename, ".rds"))
+      file.path(binary_folder, paste0(HSU_ID, ".rds"))
     )
-
-
-    # validate models on subcatchments ---------------------------------------
-    # todo at at the moment only data for airGR is read
-    input_folder <- file.path("data", main_basin, "input", "airGR", source_data_type)
-    sub_HSU_IDs <- readr::parse_number(list.files(input_folder))
-    names(sub_HSU_IDs) <- sub_HSU_IDs
-
-    # load subcatchment data
-    meteo_files <- file.path(
-      "data", main_basin, "input", "airGR",
-      source_data_type, paste0("HSU_", sub_HSU_IDs, ".rds")
+    
+    # write ascii results overview
+    ascii_folder <- file.path(output_folder, "ascii")
+    dir.create(ascii_folder, recursive = TRUE, showWarnings = FALSE)
+    
+    write_ascii(
+      file.path(ascii_folder, paste0(HSU_ID, ".txt")),
+      calibration_results, validation_results
     )
-    names(meteo_files) <- sub_HSU_IDs
-    spatial_files <- file.path(
-      "data", main_basin, "input", "airGR",
-      "basin_info", paste0("BasinInfo_", sub_HSU_IDs, "_", raster_name, ".rds")
+    
+    # save  plots --------------------------
+    figure_folder <- file.path(output_folder, "figures")
+    dir.create(figure_folder, recursive = TRUE, showWarnings = FALSE)
+    
+    # calibration validation overview plot
+    save_cal_val_plot(
+      file.path(figure_folder, paste0(HSU_ID, "_cal_val.pdf")),
+      hydro_data$BasinObs, simulation_results$Qsim, split_indices
     )
-    names(spatial_files) <- sub_HSU_IDs
-
-    # load observational and catchment specific data
-    hydro_data <- list()
-    hydro_data$BasinObs <- purrr::map(meteo_files, load_meteo_data)
-    hydro_data$BasinInfo <- purrr::map(spatial_files, readr::read_rds)
-
-    # create input dependent on model
-    input <- purrr::map2(hydro_data$BasinObs, hydro_data$BasinInfo, ~ create_input(model, .x, .y))
-
-    # simulate model for all data available
-    simulation_results <- purrr::map(input, ~ simulate_model(model, calibration_results$model_param, .x))
-
-    # loop over all subbasins
-    Qobs <- purrr::map(hydro_data$BasinObs, ~ .x$Qmm)
-
-    # calculate performance metrics for calibration period
-    perf_cal <- purrr::map2(
-      simulation_results, Qobs,
-      ~ calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs[[1]]$DatesR,
-        split_indices$ind_cal, "calibration",
-        col_name = "period",
-        .x$Qsim, .y, val_crit_transfo
-      )
-    )
-
-    # calculate performance metrics for validation period
-    perf_val <- purrr::map2(
-      simulation_results, Qobs,
-      ~ calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs[[1]]$DatesR,
-        split_indices$ind_val, "validation",
-        col_name = "period",
-        .x$Qsim, .y, val_crit_transfo
-      )
-    )
-
-    # combine periods in one data frame
-    validation_results <- purrr::map2(perf_cal, perf_val, dplyr::bind_rows)
-
-    # output overview ascii
-    # file, calibration_results, validation_results, equally_spaced = TRUE
-    file_basename <- purrr::map(sub_HSU_IDs, ~ paste0("HSU_", .x))
-    purrr::walk2(file_basename, validation_results, ~ write_ascii(
-      file.path(ascii_folder, paste0(.x, ".txt")),
-      calibration_results, .y
-    ))
-
-    # save calibration validation plot
-    save_cal_val_plot_fun <- function(a, b, c) {
-      save_cal_val_plot(
-        file.path(figure_folder, paste0(a, "_cal_val.pdf")),
-        b, c$Qsim, split_indices
-      )
-    }
-    purrr::pwalk(list(file_basename, hydro_data$BasinObs, simulation_results), save_cal_val_plot_fun)
-
-
-    # save airGR plots
-    save_airGR_plot_fun <- function(a, b, c) {
-      save_airGR_plot(
-        file.path(figure_folder, paste0(a, "_airGR.pdf")), b, c
-      )
-    }
-    purrr::pwalk(list(file_basename, simulation_results, Qobs), save_airGR_plot_fun)
-
-    # save binary results
-    save_bin_fun <- function(a, b, c) {
-      readr::write_rds(
-        list(
-          calibration = calibration_results,
-          simulation = b,
-          validation = c
-        ),
-        file.path(binary_folder, paste0(a, ".rds"))
-      )
-    }
-    purrr::pwalk(list(file_basename, simulation_results, validation_results), save_bin_fun)
+    
+    
+    # airGR plots for validation and calibration time period
+    purrr::pwalk(list(ind_list, names(ind_list)),
+                 ~ save_airGR_plot(file.path(figure_folder, paste0(HSU_ID, "_airGR_", .y, ".pdf")),
+                                   model, simulation_results, .x, hydro_data
+                 ))
   }
 }
 ```
 
+
+## load data
+
+
+```{r, eval=FALSE}
+# todo: get rid of Qm3s as this is not required 
+data(input_data)
+# todo: put a meaninful id name already in the input
+input_data <- input_data %>% rename(FOEN_ID = HSU_ID)
+# todo: get rid of HypsoData as this is not required
+data(basin_data)
+
+```
 
 ## loop over all settings
 
 
 ```{r, eval=FALSE}
 
+for (j in seq_along(cal_fn_list)){
+  for (k in seq_along(model_list)){
+    for (m in seq_along(error_crit_transfo_list)) {
+      error_crit_transfo <- error_crit_transfo_list[m]
+      model <- model_list[k]
+      cal_fn <- cal_fn_list[j]
+      
+      # set snow_module to NULL
+      if (cal_par[[model]][["has_snow_module"]]) snow_module <- NULL
 
-for (i in seq_along(source_data_type_list)){
-  for (j in seq_along(cal_fn_list)){
-    for (k in seq_along(model_list)){
-      for (m in seq_along(error_crit_transfo_list)) {
-        error_crit_transfo <- error_crit_transfo_list[m]
-        model <- model_list[k]
-        cal_fn <- cal_fn_list[j]
-        source_data_type <- source_data_type_list[i]
-        
-        cat(sprintf("%s > Start with %s and %s for model %s with target %s ...\n", 
-                    Sys.time(), source_data_type, cal_fn, model, error_crit_transfo))
-        
-        suppressMessages(calibrate_validate(model, main_basin, HSU_ID, raster_name, source_data_type,
-                                            error_crit_transfo, cal_maximize, cal_fn,
-                                            do_transfo_param, cal_par,
-                                            val_crit_transfo, val_subseason))
-      }
+      cat(sprintf("%s > Start with %s: %s for model %s with snow module %s with target %s ...\n",
+                  Sys.time(), HSU_ID, cal_fn, model, snow_module, error_crit_transfo))
+      
+      suppressWarnings(suppressMessages(calibrate_validate(model, input_data, basin_data, HSU_ID,
+                                          error_crit_transfo, cal_maximize, cal_fn,
+                                          do_transfo_param, cal_par,
+                                          val_crit_transfo, val_subseason)))
     }
   }
 }
+
 ```
 

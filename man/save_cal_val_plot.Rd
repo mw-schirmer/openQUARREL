@@ -2,33 +2,42 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{save_cal_val_plot}
 \alias{save_cal_val_plot}
-\title{Save a calibration validation plot}
+\title{Save Calibration and Validation Plot}
 \usage{
 save_cal_val_plot(file, BasinObs, Qsim, split_indices)
 }
 \arguments{
-\item{file}{the filename of the saved plot}
+\item{file}{A string specifying the filename for the saved plot (e.g., \code{"cal_val.pdf"}).}
 
-\item{BasinObs}{data frame with time series of input data from
-\code{\link{load_meteo_data}}}
+\item{BasinObs}{A data frame containing observed runoff and corresponding dates, typically from
+\code{\link{load_meteo_data}}. Must include columns \code{Qmm} and \code{DatesR}.}
 
-\item{Qsim}{vector with simulated runoff}
+\item{Qsim}{A numeric vector of simulated runoff values.}
 
-\item{split_indices}{a list of indices from \code{\link{split_data_set}}
-containing the elements \code{ind_cal} and \code{ind_val}}
+\item{split_indices}{A list of indices from \code{\link{split_data_set}}, containing elements
+\code{ind_cal} and \code{ind_val} for calibration and validation periods, respectively.}
 }
 \value{
-a logical if the file was successfully written
+A logical value indicating whether the plot was successfully saved.
 }
 \description{
-Create and save a plot containing over the calibration and validation period
+Creates and saves a plot comparing observed and simulated runoff over the calibration and validation periods.
+The plot includes performance metrics such as KGE, NSE, and percent bias, and displays them for each period.
 }
 \details{
-Plots observed and simulated runoff and displays certain error metrics
+The function generates a two-panel plot showing observed and simulated runoff for both calibration
+and validation periods. It also computes and displays selected validation metrics using
+\code{\link{calc_validation_results}}. The metrics are shown as annotations on the plot.
 }
 \note{
-todo: include a seasonal rolling mean
+Future improvements could include adding a seasonal rolling mean to the plot.
 }
 \examples{
-save_cal_val_plot("cal_val.pdf", BasinObs, split_indices)
+save_cal_val_plot(
+  file = "cal_val.pdf",
+  BasinObs = BasinObs,
+  Qsim = simulation_results$Qsim,
+  split_indices = split_indices
+)
+
 }

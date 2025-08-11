@@ -2,38 +2,28 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{norm_minmax}
 \alias{norm_minmax}
-\title{Min-max normalization and vice versa}
+\title{Min-Max Normalization and Re-Transformation}
 \usage{
 norm_minmax(x, min, max, direction = "RT")
 }
 \arguments{
-\item{x}{data to be scaled, can be a vector, array or matrix}
+\item{x}{A numeric vector, matrix, or array to be scaled or re-transformed.}
 
-\item{min}{lower bound}
+\item{min}{The minimum value used for scaling. Required for both directions,
+but typically set to \code{min(x)} when \code{direction = "RT"}.}
 
-\item{max}{upper bound}
+\item{max}{The maximum value used for scaling. Required for both directions,
+but typically set to \code{max(x)} when \code{direction = "RT"}.}
 
-\item{direction}{string indicating from real to transformed \code{"RT"} or
-vice-versa \code{"TR"}. For direction \code{"TR"} the lower and upper
-bounds are required inputs.}
+\item{direction}{A character string indicating the direction of transformation:
+\code{"RT"} (real to transformed) for normalization, or \code{"TR"} (transformed to real)
+for re-scaling. Default is \code{"RT"}.}
 }
 \value{
-transformed or re-transformed data of same format as \code{x}
+A numeric object of the same shape as \code{x}, either normalized or
 }
 \description{
-Scales data to [0,1] with min and max of applied data or with specified
-bounds
-}
-\note{
-todo: \code{function(x, min = min(x), max = max(x), direction = "RT")}
-does not work, other solutions?
-default values for min and max only valid if
-direction is also RT, how can this be required
-}
-\examples{
-vec <- runif(10, -5, 10)
-norm_minmax(vec, min(vec), max(vec))
-vecT <- norm_minmax(vec, -5, 10)
-# re-scale to vec
-norm_minmax(vecT, -5, 10, "TR")
+Scales numeric data to the [0, 1] range using min-max normalization, or
+re-transforms normalized data back to its original scale. The behavior depends
+on the specified direction.
 }

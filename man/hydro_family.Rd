@@ -5,7 +5,7 @@
 \alias{hydro_family}
 \title{Hydrofamily or Package}
 \format{
-An object of class \code{data.frame} with 7 rows and 2 columns.
+An object of class \code{data.frame} with 16 rows and 2 columns.
 }
 \usage{
 hydro_family

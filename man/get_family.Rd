@@ -2,19 +2,21 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{get_family}
 \alias{get_family}
-\title{Get the family of a model}
+\title{Get the Family or Package of a Hydrological Model}
 \usage{
 get_family(model_str)
 }
 \arguments{
-\item{model_str}{a string indicating a hydrological model}
+\item{model_str}{A string specifying the name of a hydrological model (e.g., "GR4J").}
 }
 \value{
-the package or family name
+A string indicating the model's package or family name. Returns \code{"none"} if the model is not found.
 }
 \description{
-Reverse lookup table to get the package/family of a hydrological model
+Performs a reverse lookup to identify the package or model family associated
+with a given hydrological model name.
 }
 \examples{
 get_family("GR4J")
+get_family("UnknownModel")
 }

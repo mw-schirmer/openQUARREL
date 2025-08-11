@@ -2,25 +2,55 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{save_airGR_plot}
 \alias{save_airGR_plot}
-\title{save an airGR overview plot to pdf}
+\title{Save airGR Diagnostic Plots}
 \usage{
-save_airGR_plot(file, simulation_results, Qobs)
+save_airGR_plot(
+  file,
+  model,
+  simulation_results,
+  ind = seq_along(simulation_results$date),
+  hydro_data = NULL
+)
 }
 \arguments{
-\item{file}{the filename of the saved plot}
+\item{file}{A string specifying the filename for the saved plot (e.g., \code{"airGR_plot.pdf"}).}
 
-\item{simulation_results}{output from \code{\link{simulate_model}}, i.e. the
-output object of the \code{\link{airGR}} function
-\code{\link[airGR]{RunModel}}}
+\item{model}{A string indicating the model name (e.g., \code{"CemaNeigeGR4J"}), used to determine if the model is from the airGR family.}
 
-\item{Qobs}{a vector of observed runoff}
+\item{simulation_results}{A list containing simulation outputs, typically from \code{\link{simulate_model}}.
+Must include at least \code{Qsim}, \code{Qobs}, and optionally snow-related variables like \code{SWE}, \code{psolid}, and \code{pliquid}.}
+
+\item{ind}{A vector of indices specifying the time period to plot. Defaults to the full time range.}
+
+\item{hydro_data}{Optional list containing \code{BasinObs} and \code{BasinInfo}, required if the model is not from the airGR family.}
 }
 \value{
-a logical if file was written successfully
+A logical value indicating whether the plot was successfully saved.
 }
 \description{
-use the \code{\link{airGR}} \code{\link[airGR]{plot}} function
+Generates and saves diagnostic plots for hydrological model simulations using the \pkg{airGR} plotting functions.
+This function supports both airGR and non-airGR models by converting simulation results into a compatible format.
+}
+\details{
+If the model is not from the airGR family, the function reconstructs an \code{airGR::OutputsModel} object
+using \code{\link{create_input}} and \code{\link{simulate_model}}, and overrides it with the provided simulation results.
+If snow-related outputs are present, additional snow plots are included.
+}
+\note{
+\itemize{
+\item Currently supports only one CemaNeige snow layer.
+\item A future version may support plotting without requiring \code{Qobs}.
+}
 }
 \examples{
-save_airGR_plot("airGR_plot.pdf", simulation_results, Qobs)
+save_airGR_plot(
+  file = "airGR_plot.pdf",
+  model = "CemaNeigeGR4J",
+  simulation_results = simulation_results,
+  hydro_data = hydro_data
+)
+
+}
+\seealso{
+\code{\link{simulate_model}}, \code{\link[airGR]{plot}}, \code{\link{create_input}}
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{calc_validation_results}
 \alias{calc_validation_results}
-\title{Calculates validation results for a subset period}
+\title{Validate Hydrological Model Performance}
 \usage{
 calc_validation_results(
   ind,
@@ -10,40 +10,41 @@ calc_validation_results(
   col_name = "period",
   Qsim,
   Qobs,
-  val_crit_transfo = "KGE_none"
+  val_crit_transfo = "KGE__none"
 )
 }
 \arguments{
-\item{ind}{indices used for subsetting \code{Qsim} and \code{Qobs}}
+\item{Qsim}{A numeric vector of simulated runoff values.}
 
-\item{period_name}{entries in column \code{col_name} naming the subset period}
+\item{Qobs}{A numeric vector of observed runoff values.}
 
-\item{col_name}{additional column name in returned data frame (default is
-period)}
-
-\item{Qsim}{vector with simulated runoff}
-
-\item{Qobs}{vector with observed runoff}
-
-\item{val_crit_transfo}{a vector of strings specifying validation criteria and a
-runoff transformation separated by a \code{"_"}. supported are validation
-criteria from the \code{\link{hydroGOF}} package usable by the
-\code{\link{calc_hydroGOF}} function, for supported runoff transformations
-please refer to \code{\link{transfo_q}}}
+\item{val_crit_transfo}{A character vector specifying validation criteria and runoff transformations,
+separated by \code{"__"}. Optionally, a third part can specify a lambda parameter. Supported criteria
+are those from the \code{\link[hydroGOF]{hydroGOF}} package and must be compatible with
+\code{\link{calc_hydroGOF}}. Supported transformations are described in \code{\link{transfo_q}}.}
 }
 \value{
-a data frame as \code{\link{validate_model}} but with an additional
-columns naming the period
+A long-format data frame with columns:
+\itemize{
+\item \code{crit} – the validation criterion used (e.g., "KGE", "NSE").
+\item \code{transfo} – the runoff transformation applied (e.g., "log", "inv", "none").
+\item \code{lambda} – the lambda parameter used for transformation, if applicable.
+\item \code{value} – the resulting validation metric value.
+}
 }
 \description{
-Helper function which calls \code{\link{validate_model}} and subsets \code{Qsim}
-and \code{Qobs} with \code{ind}, and returns a new data frame with an
-additional column called \code{col_name} with entries \code{period_name}
+Calculates validation metrics for simulated versus observed runoff using various transformation types.
+}
+\details{
+The function splits each entry in \code{val_crit_transfo} into components: validation criterion,
+transformation type, and optionally a lambda value. It applies the transformation to both
+\code{Qsim} and \code{Qobs}, computes the specified metric, and returns the results in a tidy format.
 }
 \examples{
-calc_validation_results(1:5, "summer", "season", 1:10, seq(0, 9))
-}
-\seealso{
-\code{\link{validate_model}}, \code{\link{calc_hydroGOF}},
-\code{\link{transfo_q}}
+validate_model(
+  Qsim = 1:10,
+  Qobs = seq(2, 11),
+  val_crit_transfo = c("KGE__log", "NSE__inv", "VE__none", "pbias__none")
+)
+
 }

@@ -4,7 +4,7 @@
 \alias{validate_model}
 \title{Validate model}
 \usage{
-validate_model(Qsim, Qobs, val_crit_transfo = "KGE_none")
+validate_model(Qsim, Qobs, val_crit_transfo = "KGE__none")
 }
 \arguments{
 \item{Qsim}{vector with simulated runoff}
@@ -12,7 +12,7 @@ validate_model(Qsim, Qobs, val_crit_transfo = "KGE_none")
 \item{Qobs}{vector with observed runoff}
 
 \item{val_crit_transfo}{a vector of strings specifying validation criteria and a
-runoff transformation separated by a \code{"_"}. Supported are validation
+runoff transformation separated by a \code{"__"}. Supported are validation
 criteria from the \code{\link{hydroGOF}} package usable by the
 \code{\link{calc_hydroGOF}} function, for supported runoff transformations
 please refer to \code{\link{transfo_q}}}
@@ -28,6 +28,6 @@ Calculates validation measures for different transformation types
 \examples{
 validate_model(
   1:10, seq(2, 11),
-  c("KGE_log", "NSE_inv", "VE_none", "pbias_none")
+  c("KGE__log", "NSE__inv", "VE__none", "pbias__none")
 )
 }

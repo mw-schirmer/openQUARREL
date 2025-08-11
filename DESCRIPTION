@@ -1,11 +1,38 @@
-Package: openQuarrel
-Title: A R meta-package for hydrological modelling
-Version: 1.0.0
-Authors@R: Michael Schirmer
-Description: A R meta-package for hydrological modelling. Includes calibration option, and validation metrics and plots.
-License: GPL-2
+Package: openQUARREL
+Title: A Meta-Package Integrating Several Hydrological Model Packages in R
+Version: 1.0.1
+Authors@R:
+    c(
+    person(given = "Michael",
+           family = "Schirmer",
+           role = c("aut", "cre"),
+           email = "michael.schirmer@wsl.ch",
+           comment = c(ORCID = "0000-0002-1097-8550")),
+    person(given = "Dorothea",
+           family = "Hug Peter",
+           role = c("aut"),
+           email = "dorothea.hug@scnat.ch"),
+    person(given = "Florian",
+           family = "Lustenberger",
+           role = c("aut"),
+           email = "florian.lustenberger@innetag.ch"),
+    person(given = "Massimiliano",
+           family = "Zappa",
+           role = c("fnd"),
+           email = "zappa@wsl.ch")
+    )
+Description: Provides a unified interface to several hydrological model packages described in Astagneau et al. (2021), https://doi.org/10.5194/hess-25-3937-2021, Includes tools for model calibration, ensemble simulation, and performance evaluation. 
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
-Imports: magrittr, airGR, hydroGOF 
+RoxygenNote: 7.3.2
+Imports: airGR, DEoptim, dplyr, gdata, grDevices, graphics, hydromad, hydroPSO, lhs, magrittr, methods, purrr, randtoolbox, readr, Rmalschains, stats, stringr, tidyr, topmodel, TUWmodel, zoo
+Depends: 
+    R (>= 4.1.0)
+Suggests:
+    hydroGOF,
+    knitr,
+    rmarkdown
+Remotes: JosephGuillaume/hydromad@oldstable, hzambran/hydroPSO 
+VignetteBuilder: knitr

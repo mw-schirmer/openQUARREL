@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{write_ascii}
 \alias{write_ascii}
-\title{Writes ascii results}
+\title{Write ASCII Summary of Calibration and Validation Results}
 \usage{
 write_ascii(
   file,
@@ -12,24 +12,34 @@ write_ascii(
 )
 }
 \arguments{
-\item{file}{filename}
+\item{file}{A string specifying the path to the output file.}
 
-\item{calibration_results}{a list containing the calibration results from
-\code{\link{calibrate_model}}. Only a vector with calibrated model
-parameters are written out}
+\item{calibration_results}{A list containing the calibration results from \code{\link{calibrate_model}}.
+Only the vector of calibrated model parameters (\code{model_param}) is written.}
 
-\item{validation_results}{a data frame containing the validation results from
+\item{validation_results}{A data frame containing validation results, typically from
 \code{\link{validate_model}}.}
 
-\item{equally_spaced}{(optional) a logical indicating if a equally spaced
-output should be written out}
+\item{equally_spaced}{Logical; if \code{TRUE} (default), attempts to write a fixed-width formatted file.
+If \code{FALSE} or if fixed-width writing fails, a tab-separated file is written instead.}
 }
 \value{
-a logical if the file was successfully written
+A logical value indicating whether the file was successfully written.
 }
 \description{
-Writes an ascii overview of parameters and validation results
+Writes a plain text (ASCII) file summarizing model calibration parameters and validation results.
+The output can be written in either tab-separated or fixed-width format.
+}
+\details{
+If \code{equally_spaced = TRUE}, the function attempts to write a fixed-width formatted file using
+\code{\link[gdata]{write.fwf}}. If an error occurs during this process, it falls back to writing
+a tab-separated file using \code{\link[readr]{write_tsv}}.
 }
 \examples{
-write_ascii("results.txt", calibration_results, validation_results)
+write_ascii(
+  file = "results.txt",
+  calibration_results = calibration_results,
+  validation_results = validation_results
+)
+
 }

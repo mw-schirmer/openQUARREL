@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{call_cal_fn}
 \alias{call_cal_fn}
-\title{Call calibration function}
+\title{Call Calibration Function for Hydrological Model}
 \usage{
 call_cal_fn(
   cal_fn,
@@ -10,54 +10,79 @@ call_cal_fn(
   split_indices,
   model,
   input,
+  snow_module = NULL,
+  snow_input = NULL,
+  snow_parameters = NULL,
   error_crit,
   cal_maximize,
   cal_q_transfo,
+  lambda,
   do_transfo_param,
   cal_par = default_cal_par
 )
 }
 \arguments{
-\item{cal_fn}{a string specifying optimization algorithm to be used for the
-model calibration Currently \code{"DEoptim"}, \code{"hydroPSO"} and
-\code{"malschains"} are supported.}
+\item{cal_fn}{A string specifying the calibration function or method to use.
+Supported options include \code{"DEoptim"}, \code{"hydroPSO"}, and \code{"malschains"}.
+Monte Carlo variants can be specified using the format \code{"method__sampling__nruns"}.}
 
-\item{hydro_data}{a list or data frame containing observed runoff loaded
-with \code{\link{load_meteo_data}}}
+\item{hydro_data}{A list or data frame containing observed runoff data, typically
+loaded using \code{\link{load_meteo_data}}.}
 
-\item{split_indices}{indices indicating the
-warm-up and calibration period, i.e. the output of
-\code{\link{split_data_set}}}
+\item{split_indices}{A list of index vectors (e.g., from \code{\link{split_data_set}})
+indicating warm-up and calibration periods.}
 
-\item{model}{a string indicating the hydrological model}
+\item{model}{A string specifying the hydrological model to calibrate.}
 
-\item{input}{model input returned by \code{\link{create_input}}}
+\item{input}{A list of model input data, typically created using \code{\link{create_input}}.}
 
-\item{error_crit}{a string of a function indicating an error criterion, e.g.
-\code{\link[hydroGOF]{KGE}}, or others from the \code{\link{hydroGOF}}
-which are usable by \code{\link{calc_hydroGOF}}
-functions}
+\item{snow_module}{Optional. A string specifying the snow module used (e.g., \code{"CemaNeige"}).}
 
-\item{cal_maximize}{a logical indicating if function should be
-maximized}
+\item{snow_input}{Optional. Input data for the snow module.}
 
-\item{cal_q_transfo}{a string indicating how runoff should be transformed
-with \code{\link{transfo_q}}}
+\item{snow_parameters}{Optional. Initial or fixed parameters for the snow module.}
 
-\item{do_transfo_param}{logical indicating
-whether calibration is done with real or transformed parameters}
+\item{error_crit}{A string naming the error criterion function (e.g., \code{"KGE"}).
+Must be compatible with \code{\link{calc_hydroGOF}} or from the \pkg{hydroGOF} package.}
 
-\item{cal_par}{a list of calibration settings dependent on the calibration
-function. Package default values \code{default_cal_par} can be overwritten
-by users.}
+\item{cal_maximize}{Logical. If \code{TRUE}, the calibration maximizes the objective function.}
+
+\item{cal_q_transfo}{A string indicating how runoff should be transformed
+(see \code{\link{transfo_q}}).}
+
+\item{lambda}{Optional. A numeric value or vector used for regularization or multi-objective weighting.}
+
+\item{do_transfo_param}{Logical. If \code{TRUE}, parameters are transformed to a unit hypercube
+before calibration.}
+
+\item{cal_par}{A list of calibration settings specific to the chosen calibration function.
+Defaults to \code{default_cal_par}, but can be customized by the user.}
+}
+\value{
+A list or object containing the results of the calibration, including optimized
+parameters and performance metrics.
 }
 \description{
-Call several optimization functions for model calibration which are available
-as R packages
+Executes a specified optimization algorithm to calibrate a hydrological model.
+Supports multiple calibration methods and Monte Carlo sampling strategies.
+}
+\note{
+This function requires the \code{hydroPSO} package to be installed. Not
+imported as this package depends on deprecated packages as sp etc.
 }
 \examples{
+\dontrun{
 cal_output <- call_cal_fn(
-  cal_fn, hydro_data, split_indices, model, input,
-  error_crit, cal_maximize, cal_q_transfo, do_transfo_param, cal_par
+  cal_fn = "DEoptim",
+  hydro_data = hydro_data,
+  split_indices = split_data_set(...),
+  model = "GR4J",
+  input = create_input(...),
+  error_crit = "KGE",
+  cal_maximize = TRUE,
+  cal_q_transfo = "none",
+  do_transfo_param = TRUE,
+  cal_par = default_cal_par
 )
+}
 }

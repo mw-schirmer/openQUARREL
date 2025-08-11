@@ -5,7 +5,7 @@
 \alias{default_cal_par}
 \title{Default calibration parameters}
 \format{
-An object of class \code{list} of length 7.
+An object of class \code{list} of length 17.
 }
 \usage{
 default_cal_par

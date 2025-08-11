@@ -1,0 +1,107 @@
+---
+title: "Run a hydrological model (minimalistic example)"
+author: "Michael Schirmer"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Run a hydrological model (minimalistic example)}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette shows how to run a hydrological model as a minimalistic example.
+
+## Preparations
+
+### Load packages
+
+```{r packages, include=FALSE}
+library(openQUARREL)
+library(dplyr)
+```
+
+```{r packages_showcode, eval=FALSE}
+library(openQUARREL)
+library(dplyr)
+```
+
+
+### Load data
+```{r load data}
+data(input_data)
+data(basin_data)
+```
+
+### Create a minimum input
+```{r minimum data}
+# can be done as separate data set
+minimum_input <- input_data %>% 
+  filter(HSU_ID == "2303") %>% 
+  select(DatesR, P, T, E)
+
+minimum_basin_info <- basin_data[["2303"]]
+# todo: delete HypsoData in general
+minimum_basin_info$HypsoData <- NULL
+
+# convert Date to POSIXct
+# todo: put it into input_data already, but is also good to show it here
+minimum_input$DatesR <- as.POSIXct(minimum_input$DatesR)
+attr(minimum_input$DatesR, "tzone") <- "UTC"
+```
+
+The data frame `minimum_input` contains columns `P` for precipitation in mm/d, `T` for air temperature in degrees Celsius and `E` for potential evapotranspiration in mm/d. See also the great [airGR get started](https://hydrogr.github.io/airGR/page_1_get_started.html) documentation. If you need to calculate `E`, there are functions available, e.g. in [airGR::PE_Oudin](https://rdrr.io/cran/airGR/man/PE_Oudin.html).
+
+```{r show_table, echo=FALSE}
+knitr::kable(head(minimum_input))
+```
+
+For the basin information `minimum_basin_info` one needs a list with ...
+
+`r minimum_basin_info`
+
+### Choose a hydrological model
+```{r settings}
+cal_par <- default_cal_par # todo: this needs to be changed
+model <- "TUW"
+```
+
+### Set model parameters
+Create a parameter set, which is here the middle points of the provided intervals. See [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html) documentation for parameter explanation. The list `default_cal_par` is loaded with `library(openQUARREL)` and holds model and calibration specific settings. 
+```{r param}
+param <- (default_cal_par[[model]]$upper + default_cal_par[[model]]$lower) / 2
+print(param)
+```
+
+### Create input 
+This is done specifically for each model/package requirement, here [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html).
+```{r input}
+# todo: check on basin_info
+input <- create_input(model, minimum_input, list())
+```
+
+
+## Run the model
+```{r run_model}
+sim <- simulate_model(model, param, input)
+```
+
+The output is a list with fields `r names(sim)`. You can access typical components as simulated discharge `Qsim`, and if provided in the input also the observed discharge `Qobs`. If a snow module is integrated in the model or chosen to be added (see `vignette("include_snow_module")`) snow water equivalent `SWE`, the partitioned precipitation fluxes `pliquid` and `psolid`, and the snow `melt` flux. The element `more_info` is specific to the chosen model and package, in this case [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html).  
+```{r output}
+str(sim)
+```
+
+## Plot results
+Here is a simple plot for simulated discharge with skipping the first ~3 years (warm-up):
+```{r plot}
+plot(sim$date[3*365:length(sim$date)], sim$Qsim[3*365:length(sim$date)], type = "l", main = "Simulated Discharge", ylab = "Q [mm/d]", xlab = "Date")
+
+```
+
+## Next steps
+Now you do this again with a different hydrological model (todo: link to a list) ... or proceed with `vignette("include_snow_module")`. 

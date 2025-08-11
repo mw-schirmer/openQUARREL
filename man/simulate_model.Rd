@@ -2,35 +2,70 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{simulate_model}
 \alias{simulate_model}
-\title{Simulate a hydrological model}
+\title{Simulate a Hydrological Model}
 \usage{
-simulate_model(model, model_param, input, ind = seq_along(input[[1]]))
+simulate_model(
+  model,
+  model_param,
+  input,
+  ind = seq_along(input[[1]]),
+  Qobs = NULL,
+  airGR_RunOptions = NULL
+)
 }
 \arguments{
-\item{model}{a string specifying the hydrological model, currently
-implemented are airGR and TUWmodel package models}
+\item{model}{A string specifying the hydrological model to use. Supported models include
+\code{"TUW"}, \code{"topmodel"}, \code{"hydromad"} models (e.g., \code{"sacramento"}, \code{"cwi"}),
+and \pkg{airGR} models (e.g., \code{"GR4J"}, \code{"CemaNeigeGR4J"}).}
 
-\item{model_param}{a vector of model parameters specific for each model
-choice}
+\item{model_param}{A numeric vector of model parameters specific to the chosen model.}
 
-\item{input}{the output of the \code{create_input} function, dependent on the
-model choice, in general containing information about date, precipitation
-air temperature and potential evapotranspiration and spatial information as
-area of the catchment or hypsometric curves}
+\item{input}{A list of model input data, typically created using \code{\link{create_input}}.
+Must include time series of precipitation (\code{P}), temperature (\code{T}), and optionally
+evapotranspiration (\code{E}), as well as spatial data like catchment area or topography.}
 
-\item{ind}{a vector of indices which can be used to subset the time dependent
-elements in input. The default is taking all indices from the first element
-of input}
+\item{ind}{A vector of indices specifying the time steps to simulate. Defaults to the full range.}
+
+\item{Qobs}{Optional. A vector of observed discharge values to include in the output for comparison.}
+
+\item{airGR_RunOptions}{Optional. A pre-created \code{RunOptions} object for \pkg{airGR} models.}
 }
 \value{
-a list with the elements \code{Qsim}, the simulated runoff, and
-\code{more_info} with model specific output
+A list containing:
+\itemize{
+\item \code{date}: Vector of simulation dates.
+\item \code{Qsim}: Simulated discharge.
+\item \code{Qobs}: Observed discharge (if provided).
+\item \code{SWE}: Snow water equivalent (if available).
+\item \code{psolid}: Solid precipitation (if available).
+\item \code{pliquid}: Liquid precipitation (if available).
+\item \code{melt}: Meltwater (if available).
+\item \code{more_info}: A list with model-specific output.
+}
 }
 \description{
-Takes a model choice, model parameters, model input and indices indicating a
-time subset of the model input which should be used and simulates discharge
-values and model specific output
+Simulates discharge using a specified hydrological model over a given time period.
+Supports models from the \pkg{airGR}, \pkg{TUWmodel}, \pkg{hydromad}, and \pkg{topmodel} packages.
+Optionally includes snow-related outputs if the model supports it.
+}
+\note{
+\itemize{
+\item For \pkg{airGR} models, the appropriate \code{RunModel_*} function is called.
+\item For \pkg{hydromad} models, missing dates are filled to ensure compatibility.
+\item Snow-related outputs are only available for models that simulate snow processes.
+\item If \code{Qobs} is provided, its length must match the length of \code{Qsim}.
+}
 }
 \examples{
-simulation_results <- simulate_model("TUWmodel", calibration_results$model_param, input, ind = split_indices$ind_cal)
+\dontrun{
+simulation_results <- simulate_model(
+  model = "TUW",
+  model_param = calibration_results$model_param,
+  input = input,
+  ind = split_indices$ind_cal
+)
+}
+}
+\seealso{
+\code{\link{simulate_snow}}, \code{\link{create_input}}, \code{\link{calibrate_model}}
 }

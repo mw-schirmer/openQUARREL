@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{calc_subseasonal_validation_results}
 \alias{calc_subseasonal_validation_results}
-\title{Calculates subseasonal validation results}
+\title{Calculate Subseasonal Validation Metrics}
 \usage{
 calc_subseasonal_validation_results(
   val_subseason,
@@ -12,62 +12,61 @@ calc_subseasonal_validation_results(
   col_name = "period",
   Qsim,
   Qobs,
-  val_crit_transfo = "KGE_none"
+  val_crit_transfo = "KGE__none"
 )
 }
 \arguments{
-\item{val_subseason}{a list with named arrays of two digits describing
-months used to calculate subseasonal validation metrics}
+\item{val_subseason}{A named list where each element is a character vector of two-digit month codes
+(e.g., \code{"06"}, \code{"07"}) defining the months for each subseasonal period.}
 
-\item{ind}{indices used for subsetting \code{hydro_data}}
+\item{dates}{A vector of dates (e.g., of class \code{Date} or \code{POSIXct}) corresponding to the time series.}
 
-\item{period_name}{entries in column \code{col_name} naming the subset period}
+\item{ind}{A vector of indices used to subset the hydrological data.}
 
-\item{col_name}{additional column name in returned data frame (default is
-period)}
+\item{period_name}{A string indicating the name of the period (e.g., \code{"calibration"} or \code{"validation"}),
+which will be added as a column in the output.}
 
-\item{Qsim}{vector with simulated runoff}
+\item{col_name}{A string specifying the name of the additional column to be added to the output
+(default is \code{"period"}).}
 
-\item{Qobs}{vector with observed runoff}
+\item{Qsim}{A numeric vector of simulated runoff values.}
 
-\item{val_crit_transfo}{a vector of strings specifying validation criteria and a
-runoff transformation separated by a \code{"_"}. supported are validation
-criteria from the \code{\link{hydroGOF}} package usable by the
-\code{\link{calc_hydroGOF}} function, for supported runoff transformations
-please refer to \code{\link{transfo_q}}}
+\item{Qobs}{A numeric vector of observed runoff values.}
 
-\item{date}{date a vector of dates (e.g. Dates, Posix)
-with \code{\link{load_meteo_data}}}
+\item{val_crit_transfo}{A character vector specifying validation criteria and runoff transformations,
+separated by \code{"__"}. Optionally, a third part can specify a lambda parameter. Supported criteria
+are those from the \code{\link[hydroGOF]{hydroGOF}} package and must be compatible with
+\code{\link{calc_hydroGOF}}. Supported transformations are described in \code{\link{transfo_q}}.}
 }
 \value{
-a data frame as \code{\link{validate_model}} but with two additional
-columns naming the period and the season
+A data frame similar to the output of \code{\link{validate_model}}, but with two additional
+columns: one for the subseasonal period (e.g., \code{"spring"}, \code{"summer"}) and one for the period name
+(e.g., \code{"calibration"}), as specified by \code{col_name} and \code{period_name}.
 }
 \description{
-Within a subset of hydrological input data \code{hydro_data} subset with
-\code{ind} it calculates performances metrics for monthly defined periods by
-calling \code{\link{calc_validation_results}} with \code{col_name = "season"}
-and the period names from the names in \code{val_subseason}.
-Returns a new data frame with an
-additional column called \code{col_name} with entries \code{period_name}
+Computes validation metrics for specified subseasonal periods within a hydrological dataset.
+For each named period in \code{val_subseason}, the function subsets the data using the provided indices
+and calculates performance metrics using \code{\link{calc_validation_results}}.
 }
 \examples{
 perf_cal <- calc_subseasonal_validation_results(
   val_subseason = list(
     spring = c("02", "03", "04", "05"),
-    summer = c("06", "07", "08", "09"),
-    hydro_data$BasinObs$DatesR,
-    split_indices$ind_cal, "calibration",
-    col_name = "period",
-    simulation_results$Qsim, Qobs,
-    val_crit_transfo =
-      c(
-        "KGE_none", "NSE_none", "VE_none", "pbias_none",
-        "KGE_inv", "NSE_inv",
-        "KGE_sqrt", "NSE_sqrt"
-      )
+    summer = c("06", "07", "08", "09")
+  ),
+  dates = hydro_data$BasinObs$DatesR,
+  ind = split_indices$ind_cal,
+  period_name = "calibration",
+  col_name = "period",
+  Qsim = simulation_results$Qsim,
+  Qobs = Qobs,
+  val_crit_transfo = c(
+    "KGE__none", "NSE__none", "VE__none", "pbias__none",
+    "KGE__inv", "NSE__inv",
+    "KGE__sqrt", "NSE__sqrt"
   )
 )
+
 }
 \seealso{
 \code{\link{calc_validation_results}}, \code{\link{validate_model}},

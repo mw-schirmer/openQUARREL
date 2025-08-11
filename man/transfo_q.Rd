@@ -2,27 +2,31 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{transfo_q}
 \alias{transfo_q}
-\title{Transforms runoff}
+\title{Apply transformation to runoff data}
 \usage{
-transfo_q(Q, q_transfo_type = "none")
+transfo_q(Q, q_transfo_type = "none", lambda = 0.25, ...)
 }
 \arguments{
-\item{Q}{vector, matrix, data.frame etc of runoff values}
+\item{Q}{A numeric vector, matrix, or data frame of runoff values.}
 
-\item{q_transfo_type}{a string indicating how the runoff should be
-transformed. Currently \code{"none"}, \code{"sqrt"}, \code{"inv"} and
-\code{"log"} are supported.}
+\item{q_transfo_type}{A string specifying the transformation type. Options are:
+"none", "sqrt", "inv", "log", "boxcox", "boxcoxsantos", and "power".}
+
+\item{lambda}{A numeric value used for Box-Cox and power transformations. Default is 0.25.}
+
+\item{...}{Additional arguments passed to mean(), e.g., na.rm = TRUE, used in boxcoxsantos.}
 }
 \value{
-transformed runoff in same format as input
+Transformed runoff data in the same format as input.
 }
 \description{
-Inverse, sqrt and no transform of runoff, log is not advised for KGE, see
-airGR or Santos 2018
+Supports inverse, square root, power, and Box-Cox transformations of runoff data.
+Log transformation is included but generally not recommended for KGE calculations
+(see airGR or Santos, 2018). Use Use \code{\link{KGEtang}} instead.
 }
 \note{
-todo: discuss what to do with Infinity
+Consider how to handle infinite values resulting from transformations.
 }
 \examples{
-transfo_q(array(0:10, c(2, 5)), "log")
+transfo_q(array(0:10, c(2, 5)), "sqrt")
 }

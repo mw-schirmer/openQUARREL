@@ -2,25 +2,22 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{find_monthly_indices}
 \alias{find_monthly_indices}
-\title{Monthly indices}
+\title{Find Monthly Indices in a Date Vector}
 \usage{
 find_monthly_indices(date, months, ind = seq_along(date))
 }
 \arguments{
-\item{date}{a vector of dates (e.g. Dates, Posix)}
+\item{date}{A vector of dates (e.g., \code{Date}, \code{POSIXt}).}
 
-\item{months}{a vector of months in double digits strings, e.g.
-\code{c("02",  "03")}}
+\item{months}{A character vector of two-digit month strings (e.g., \code{c("02", "03")}).}
 
-\item{ind}{a vector of indices which can be used to subset the time dependent
-elements in input.}
+\item{ind}{An optional vector of indices used to subset the input date vector before filtering.
+Defaults to all indices in the date vector.}
 }
 \value{
-a vector with indices
+An integer vector of indices corresponding to
 }
 \description{
-Returns monthly indices for specified months within a date vector
-}
-\examples{
-find_monthly_indices(seq(from = as.Date("1981-01-01"), to = as.Date("2020-12-31"), by = "days"), c("02", "03"))
+Returns the indices of dates that fall within specified months. Useful for
+subsetting time series data by month.
 }

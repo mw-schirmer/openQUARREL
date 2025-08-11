@@ -2,47 +2,61 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{transfo_param}
 \alias{transfo_param}
-\title{Parameter transformation}
+\title{Parameter Transformation to and from Hypercube}
 \usage{
-transfo_param(param, direction, model, cal_parameter = default_cal_par)
+transfo_param(
+  param,
+  direction,
+  model,
+  snow_module = NULL,
+  add_snow_par = FALSE,
+  cal_parameter = default_cal_par
+)
 }
 \arguments{
-\item{param}{vector of model parameters}
+\item{param}{A numeric vector of model parameters.}
 
-\item{direction}{string indicating from real to transformed \code{"RT"} or
-vice-versa \code{"TR"}.}
+\item{direction}{A character string indicating the direction of transformation:
+\code{"RT"} (real to transformed) or \code{"TR"} (transformed to real).}
 
-\item{model}{a string specifying the hydrological model}
+\item{model}{A character string specifying the hydrological model (e.g., \code{"GR4J"},
+\code{"TUW"}, \code{"CemaNeigeGR4J"}).}
+
+\item{snow_module}{Optional. A character string specifying the snow module to be included
+in the transformation (e.g., \code{"CemaNeige"}).}
+
+\item{add_snow_par}{Logical. If \code{TRUE}, snow module parameters are included in the
+transformation. Default is \code{FALSE}.}
+
+\item{cal_parameter}{A list containing calibration parameter bounds (lower and upper)
+for each model and snow module. Defaults to \code{default_cal_par}.}
 }
 \value{
-a vector with transformed parameters
+A numeric vector of transformed or re-transformed parameters.
 }
 \description{
-Transforms model parameters to hypercube and vice versa
+Transforms model parameters to the unit hypercube [0, 1] and back, depending on the
+specified direction. For \code{airGR} models, the corresponding transformation functions
+from the \pkg{airGR} package are used. For other models, a min-max normalization
+approach is applied using \code{\link{norm_minmax}}.
 }
 \details{
-For airGR models the functions \code{\link[airGR]{TransfoParam}} of package
-\code{\link{airGR}}  are applied.
-Model combinations as \code{"CemaNeigeGR4J"} are allowed.
-
-For other models the parameter space is transformed to [0,1] with
-\code{\link{norm_minmax}}
+Model combinations such as \code{"CemaNeigeGR4J"} are supported. Parameters for snow
+modules can also be included and transformed independently.
 }
 \note{
-todo: 1) CemaNeigeHyst is not implemented yet
-2) how do the links work without airGR installed?
-3) implement functionality that airGR functions are not used at all
+\enumerate{
+\item \code{CemaNeigeHyst} is not yet implemented.
+\item The \code{airGR} transformation functions require the \pkg{airGR} package to be installed.
+\item Future versions may include an option to bypass \pkg{airGR} transformations entirely.
+}
 }
 \examples{
-# scale a parameter set for model "TUW" to [0,1] and back
+# Scale a parameter set for model "TUW" to [0,1] and back
 param <- c(1, 2, 3, -1, 1, 1, 200, 10, 1, 15, 100, 50, 2, 15, 50)
 scaled <- transfo_param(param, "RT", "TUW")
 rescaled <- transfo_param(scaled, "TR", "TUW")
-# scale a parameter set for "CemaNeigeGR4J"  to [-9.99,9.99] and back
-param <- c(1000, 2, 250, 7, .2, 109.0365)
-scaled <- transfo_param(param, "RT", "CemaNeigeGR4J")
-rescaled <- transfo_param(scaled, "TR", "CemaNeigeGR4J")
 }
 \seealso{
-\code{\link[airGR]{TransfoParam}}
+\code{\link[airGR]{TransfoParam}}, \code{\link{norm_minmax}}
 }

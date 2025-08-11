@@ -2,36 +2,39 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{load_meteo_data}
 \alias{load_meteo_data}
-\title{Load meteo data}
+\title{Load Meteorological Data}
 \usage{
 load_meteo_data(file, tzone = "UTC")
 }
 \arguments{
-\item{file}{file}
+\item{file}{A string specifying the path to the \code{.rds} file containing the meteorological data.}
 
-\item{tzone}{transfers the \code{DatesR} column to POSiXct to time zone
-\code{tzone} if \code{"UTC"} (default) is chosen, a Date vector is not
-transferred to another time zone}
+\item{tzone}{A string specifying the time zone to assign to the \code{DatesR} column.
+If \code{"UTC"} (default), a \code{Date} vector is not converted to another time zone.}
 }
 \value{
-a data frame BasinObs
+A data frame named \code{BasinObs} containing the loaded and time-adjusted data.
 }
 \description{
-Loads a data frame stored in an .rds file containing meteo data as required
-by the airGR family (see
-\url{https://odelaigue.github.io/airGR/page_1_get_started.html)}. Required
-are columns listed under Details
+Loads a data frame stored in an \code{.rds} file containing meteorological data
+formatted similar to the airGR model family. The input must include specific
+columns as described below.
 }
 \details{
-Required columns:
+The input data frame must contain the following columns:
 \itemize{
-\item DatesR: dates in the POSIXt or Date format
-\item P: average precipitation [mm/day]
-\item T: catchment average air temperature [<U+2103>]
-\item E: catchment average potential evapotranspiration [mm/day]
-\item Qmm: outlet discharge [mm/day]
+\item \code{DatesR}: Dates in \code{Date} or \code{POSIXt} format
+\item \code{P}: Average precipitation [mm/day]
+\item \code{T}: Catchment average air temperature [°C]
+\item \code{E}: Catchment average potential evapotranspiration [mm/day]
+\item \code{Qmm}: Outlet discharge [mm/day]
 }
+
+For more information on the required format, see the airGR documentation:
+\url{https://hydrogr.github.io/airGR/page_1_get_started.html}
 }
 \examples{
+\dontrun{
 load_meteo_data("D:/input/airGR/HSU_2044.rds")
+}
 }

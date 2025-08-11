@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_and_settings.R
 \name{optim_fn}
 \alias{optim_fn}
-\title{Function to be optimized during calibration}
+\title{Objective Function for Hydrological Model Calibration}
 \usage{
 optim_fn(
   ParamOptim,
@@ -10,88 +10,94 @@ optim_fn(
   split_indices,
   model,
   input,
+  snow_module = NULL,
+  snow_input,
+  snow_parameters = NULL,
   error_crit,
   cal_maximize,
   cal_q_transfo,
-  do_transfo_param
+  lambda,
+  do_transfo_param,
+  airGR_RunOptions = NULL,
+  airGR_RunOptions_snow_module = NULL
 )
 }
 \arguments{
-\item{ParamOptim}{vector of model parameters to be optimized}
+\item{ParamOptim}{A numeric vector of model parameters to be optimized.}
 
-\item{hydro_data}{a list or data frame containing observed runoff loaded
-with \code{\link{load_meteo_data}}}
+\item{hydro_data}{A list or data frame containing observed runoff, typically loaded
+using \code{\link{load_meteo_data}}.}
 
-\item{split_indices}{indices indicating the
-warm-up and calibration period, i.e. the output of
-\code{\link{split_data_set}}}
+\item{split_indices}{A list of index vectors indicating warm-up and calibration periods,
+usually from \code{\link{split_data_set}}.}
 
-\item{model}{a string indicating the hydrological model}
+\item{model}{A string specifying the hydrological model.}
 
-\item{input}{model input returned by \code{\link{create_input}}}
+\item{input}{A list of model input data, typically created using \code{\link{create_input}}.}
 
-\item{error_crit}{a string of a function indicating an error criterion, e.g.
-\code{\link[hydroGOF]{KGE}}, or others from the \code{\link{hydroGOF}}
-which are usable by \code{\link{calc_hydroGOF}}
-functions}
+\item{snow_module}{Optional. A string specifying the snow module (e.g., \code{"CemaNeige"}).}
 
-\item{cal_maximize}{a logical indicating if function should be
-maximized}
+\item{snow_input}{Optional. Input data for the snow module.}
 
-\item{cal_q_transfo}{a string indicating how runoff should be transformed
-with \code{\link{transfo_q}}}
+\item{snow_parameters}{Optional. A vector of fixed snow parameters. If \code{NULL},
+snow parameters are assumed to be part of \code{ParamOptim}.}
 
-\item{do_transfo_param}{logical indicating
-whether calibration is done with real or transformed parameters}
+\item{error_crit}{A string naming the error criterion function (e.g., \code{"KGE"}).
+Must be compatible with \code{\link{calc_hydroGOF}} or from the \pkg{hydroGOF} package.}
+
+\item{cal_maximize}{Logical. If \code{TRUE}, the calibration maximizes the objective function.}
+
+\item{cal_q_transfo}{A string indicating how runoff should be transformed
+(see \code{\link{transfo_q}}).}
+
+\item{lambda}{Optional. A numeric value or vector used for regularization or transformation.}
+
+\item{do_transfo_param}{Logical. If \code{TRUE}, parameters are transformed from the unit hypercube
+to real-world values before simulation.}
+
+\item{airGR_RunOptions}{Optional. Run options for \pkg{airGR} models.}
+
+\item{airGR_RunOptions_snow_module}{Optional. Run options for the snow module if using \pkg{airGR}.}
 }
 \value{
-error criterion to be optimized
+A single numeric value representing the error criterion to be minimized or maximized.
 }
 \description{
-Function that takes global parameters (see Details) and performs
-optimization to find best parameter set
+This function is used as the objective function during model calibration.
+It simulates a hydrological model over the warm-up and calibration periods
+and evaluates an error criterion (e.g., KGE) on the calibration period only.
 }
 \details{
-Simulates a hydrological model during warm-up and calibration
-period, and calculates an error criterion \code{error_crit} on the
-calibration period only.
-
-Replace NA in error criterion, which is generated when simulated runoff is
-\itemize{
-\item solely NAs: set a particularly bad value, i.e. +/- 1e10
-(dependent on minimization or maximization)
-\item solely 0s for \code{\link[hydroGOF]{KGE}}: set to asymptotic value,
-i.e. 1 - sqrt(3)
-\item for all other cases it throws an error
-}
+The function handles parameter transformation, snow module simulation,
+and error handling for cases where the simulated runoff is invalid (e.g., all NAs or zeros).
 }
 \note{
-: Qsim is converted to numeric to similar to Qobs, this is important for
-TUW for example, which returns a matrix 1 x time, for the lumped case.
-todo:
-\enumerate{
-\item include a spatial explicit version
-\item exclude warning for other NA cases
-in error criterion as described above
-\item Consider to link KGE etc with cal_maximize
+\itemize{
+\item If \code{Qsim} is entirely \code{NA}, a large penalty value (\code{+/- 1e10}) is returned.
+\item If \code{Qsim} is all zeros and the criterion is \code{KGE}, the asymptotic value \code{1 - sqrt(3)} is returned.
+\item \code{Qsim} is coerced to numeric to ensure compatibility with \code{Qobs}, especially for models like TUW.
+\item Future improvements may include spatially explicit versions and refined NA handling.
 }
 }
 \examples{
-# differential evolution
+\dontrun{
 cal_results <- DEoptim::DEoptim(
-  fn = optim_fn, hydro_data = hydro_data, split_indices = split_indices,
-  model = model, input = input, error_crit = error_crit, cal_maximize = cal_maximize,
-  cal_q_transfo = cal_q_transfo, do_transfo_param = do_transfo_param,
-  lower = lower, upper = upper,
-  control = DEoptim::DEoptim.control(
-    NP = cal_par[[model]][["DEoptim"]][["NP"]],
-    itermax = cal_par[[model]][["DEoptim"]][["itermax"]],
-    trace = 10
-  )
+  fn = optim_fn,
+  lower = lower,
+  upper = upper,
+  control = DEoptim::DEoptim.control(NP = 50, itermax = 100),
+  hydro_data = hydro_data,
+  split_indices = split_indices,
+  model = "GR4J",
+  input = input,
+  error_crit = "KGE",
+  cal_maximize = TRUE,
+  cal_q_transfo = "none",
+  do_transfo_param = TRUE
 )
 }
+}
 \seealso{
-\code{\link{calibrate_model}}, \code{\link{calibrate_model}},
-\code{\link{create_input}}, \code{\link{load_meteo_data}},
-\code{\link{calc_hydroGOF}}
+\code{\link{calibrate_model}}, \code{\link{create_input}}, \code{\link{load_meteo_data}},
+\code{\link{calc_hydroGOF}}, \code{\link{transfo_param}}, \code{\link{simulate_model}}, \code{\link{simulate_snow}}
 }
