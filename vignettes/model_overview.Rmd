@@ -1,0 +1,73 @@
+---
+title: "Model overview"
+author: "Michael Schirmer"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Model overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Hydrological models
+
+Hydrological models included and tested in the openQUARREL package.
+
+**Note:** There are more models in the original packages, e.g. daily and monthly models in airGR or redundant airGR models in the hydromad package.
+
+```{r, echo=FALSE}
+
+knitr::kable(
+  tibble::tibble(
+    Model = c(
+      "GR4J", "GR5J", "GR6J",
+      "CemaNeigeGR4J", "CemaNeigeGR5J", "CemaNeigeGR6J",
+      "cmd", "snow", "cwi", "awbm", "sacramento", "bucket",
+      "TUW",
+      "topmodel"
+    ),
+    "has own snow module" = c(
+      "", "", "", 
+      "X", "X", "X",
+      "", "X", "", "", "", "",
+      "X",
+      ""
+    ),
+    Package = c(
+      rep("[airGR](https://hydrogr.github.io/airGR/index.html)", 6),
+      rep("[hydromad](https://hydromad.github.io/index.html)", 6),
+      "[TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html)",
+      "[topmodel](https://github.com/ICHydro/topmodel) "
+    )
+  ),
+  align = c("l", "c", "l")
+)
+
+```
+
+
+
+## Snow modules
+
+Snow modules included and tested in the openQUARREL package. TUWsnow is the snow module of TUWmodel. The snow module of snow is not implemented yet.
+
+```{r, echo=FALSE}
+
+knitr::kable(
+  tibble::tibble(
+    "Snow module" = c(
+      "CemaNeige", "TUWsnow"
+    ),
+    Package = c(
+      "airGR", "TUWmodel"
+    )
+  ),
+)
+
+```

@@ -7,7 +7,8 @@
 set_cal_par(model, setting_name_value, cal_par)
 }
 \arguments{
-\item{model}{A string specifying the model name (e.g., \code{"TUW"}), used to access the corresponding sublist in \code{cal_par}.}
+\item{model}{A string specifying the model name (e.g., \code{"TUW"}), used to access the corresponding sublist in \code{cal_par}.
+For a complete list see table in \code{vignette("model_overview")}.}
 
 \item{setting_name_value}{A string representing the setting to update, in the format \code{"sublist$parameter = value"}.
 This string is parsed and evaluated to modify the calibration settings.}

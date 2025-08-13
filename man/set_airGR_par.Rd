@@ -7,7 +7,8 @@
 set_airGR_par(model)
 }
 \arguments{
-\item{model}{A string specifying the airGR model (e.g., \code{"GR4J"}, \code{"CemaNeigeGR4J"}).}
+\item{model}{A string specifying the airGR model (e.g., \code{"GR4J"}, \code{"CemaNeigeGR4J"}).
+For a complete list see table in \code{vignette("model_overview")}.}
 }
 \value{
 A list containing:

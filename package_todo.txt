@@ -5,19 +5,13 @@ check on topmodel delay
 works because of partial matching
 See if there is output on vilan for topmodel, as there are the old basin infos without these fields!!!
 
-
-include snow module
-
-describe all models
-
 explain calibration options
 
 create vignettes(1 minimalistic, snow modules, calibration_methods, putting all together)
 
 data from camels
 
-installation instruction, check also dependencies with other packages, explain how to get hydromad ...
-check on airGR version, especially as one function is not available in newer updates. ask authors or write a wrapper
+newer versions of airGR and hydromad: ask authors or write a wrapper
 
 check snow output for hydromad
 

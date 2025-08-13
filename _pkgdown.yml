@@ -6,6 +6,7 @@ articles:
   navbar: ~
   contents:
   - run_model_minimalistic
+  - model_overview
   - include_snow_module
   - calibrate_validate
 

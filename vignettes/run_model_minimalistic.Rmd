@@ -104,4 +104,4 @@ plot(sim$date[3*365:length(sim$date)], sim$Qsim[3*365:length(sim$date)], type = 
 ```
 
 ## Next steps
-Now you do this again with a different hydrological model (todo: link to a list) ... or proceed with `vignette("include_snow_module")`. 
+Now you do this again with a different hydrological model (see table in `vignette("model_overview")`), or proceed with `vignette("include_snow_module")`. 

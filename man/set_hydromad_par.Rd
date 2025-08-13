@@ -8,7 +8,7 @@ set_hydromad_par(model, routing = "expuh")
 }
 \arguments{
 \item{model}{A string specifying the soil moisture accounting (SMA) model (e.g., \code{"gr4j"}, \code{"sacramento"}, \code{"snow"}),
-or a pre-defined \code{hydromad} model object.}
+or a pre-defined \code{hydromad} model object. For a complete list see table in \code{vignette("model_overview")}.}
 
 \item{routing}{A string specifying the routing model (e.g., \code{"expuh"}, \code{"lambda"}). Only used if \code{model} is a string.}
 }

@@ -243,6 +243,7 @@ load_meteo_data <- function(file, tzone = "UTC") {
 #' model's requirements.
 #'
 #' @param model A string specifying the hydrological model (e.g., \code{"GR4J"}, \code{"TUW"}, \code{"topmodel"}).
+#'   For a complete list see table in `vignette("model_overview")`.
 #' @param BasinObs A data frame containing time series of meteorological and hydrological data,
 #'   typically created using \code{\link{load_meteo_data}}.
 #' @param BasinInfo A list containing spatial and catchment-specific information such as
@@ -480,8 +481,9 @@ norm_minmax <- function(x, min, max, direction = "RT") {
 #'   \code{"RT"} (real to transformed) or \code{"TR"} (transformed to real).
 #' @param model A character string specifying the hydrological model (e.g., \code{"GR4J"},
 #'   \code{"TUW"}, \code{"CemaNeigeGR4J"}).
+#'   For a complete list see table in `vignette("model_overview")`.
 #' @param snow_module Optional. A character string specifying the snow module to be included
-#'   in the transformation (e.g., \code{"CemaNeige"}).
+#'   in the transformation (currently \code{"CemaNeige"} and \code{"TUWsnow"}).
 #' @param add_snow_par Logical. If \code{TRUE}, snow module parameters are included in the
 #'   transformation. Default is \code{FALSE}.
 #' @param cal_parameter A list containing calibration parameter bounds (lower and upper)
@@ -574,8 +576,9 @@ transfo_param <- function(param, direction, model, snow_module = NULL, add_snow_
 #' @param split_indices A list of index vectors (e.g., from \code{\link{split_data_set}})
 #'   indicating warm-up and calibration periods.
 #' @param model A string specifying the hydrological model to calibrate.
+#'    For a complete list see table in `vignette("model_overview")`.
 #' @param input A list of model input data, typically created using \code{\link{create_input}}.
-#' @param snow_module Optional. A string specifying the snow module used (e.g., \code{"CemaNeige"}).
+#' @param snow_module Optional. A string specifying the snow module used (currently \code{"CemaNeige"} and \code{"TUWsnow"}).
 #' @param snow_input Optional. Input data for the snow module.
 #' @param snow_parameters Optional. Initial or fixed parameters for the snow module.
 #' @param error_crit A string naming the error criterion function (e.g., \code{"KGE"}).
@@ -1362,8 +1365,9 @@ call_cal_fn <- function(cal_fn, hydro_data, split_indices, model, input,
 #' @param split_indices A list of index vectors indicating warm-up and calibration periods,
 #'   usually from \code{\link{split_data_set}}.
 #' @param model A string specifying the hydrological model.
+#'   For a complete list see table in `vignette("model_overview")`.
 #' @param input A list of model input data, typically created using \code{\link{create_input}}.
-#' @param snow_module Optional. A string specifying the snow module (e.g., \code{"CemaNeige"}).
+#' @param snow_module Optional. A string specifying the snow module (currently \code{"CemaNeige"} and \code{"TUWsnow"}).
 #' @param snow_input Optional. Input data for the snow module.
 #' @param snow_parameters Optional. A vector of fixed snow parameters. If \code{NULL},
 #'   snow parameters are assumed to be part of \code{ParamOptim}.
@@ -1507,8 +1511,9 @@ optim_fn <- function(ParamOptim, hydro_data, split_indices, model, input,
 #' @param split_indices A list of index vectors (e.g., from \code{\link{split_data_set}})
 #'   indicating warm-up and calibration periods.
 #' @param model A string specifying the hydrological model to calibrate.
+#'   For a complete list see table in `vignette("model_overview")`.
 #' @param input A list of model input data, typically created using \code{\link{create_input}}.
-#' @param snow_module Optional. A string specifying the snow module (e.g., \code{"CemaNeige"}).
+#' @param snow_module Optional. A string specifying the snow module (currently \code{"CemaNeige"} and \code{"TUWsnow"}).
 #' @param snow_input Optional. Input data for the snow module.
 #' @param snow_parameters Optional. A vector of fixed snow parameters. If \code{NULL},
 #'   snow parameters are assumed to be part of the calibration.
@@ -1828,6 +1833,7 @@ simulate_snow <- function(snow_module, model_param, input, ind = seq_along(input
 #' @param model A string specifying the hydrological model to use. Supported models include
 #'   \code{"TUW"}, \code{"topmodel"}, \code{"hydromad"} models (e.g., \code{"sacramento"}, \code{"cwi"}),
 #'   and \pkg{airGR} models (e.g., \code{"GR4J"}, \code{"CemaNeigeGR4J"}).
+#'   For a complete list see table in `vignette("model_overview")`.
 #' @param model_param A numeric vector of model parameters specific to the chosen model.
 #' @param input A list of model input data, typically created using \code{\link{create_input}}.
 #'   Must include time series of precipitation (\code{P}), temperature (\code{T}), and optionally
@@ -2441,6 +2447,7 @@ save_cal_val_plot <- function(file, BasinObs, Qsim, split_indices) {
 #'
 #' @param file A string specifying the filename for the saved plot (e.g., `"airGR_plot.pdf"`).
 #' @param model A string indicating the model name (e.g., `"CemaNeigeGR4J"`), used to determine if the model is from the airGR family.
+#'   For a complete list see table in `vignette("model_overview")`.
 #' @param simulation_results A list containing simulation outputs, typically from \code{\link{simulate_model}}.
 #'   Must include at least \code{Qsim}, \code{Qobs}, and optionally snow-related variables like \code{SWE}, \code{psolid}, and \code{pliquid}.
 #' @param ind A vector of indices specifying the time period to plot. Defaults to the full time range.
@@ -2510,6 +2517,7 @@ save_airGR_plot <- function(file, model, simulation_results, ind = seq_along(sim
 #' Updates a specific entry in a nested calibration parameter list for a given model.
 #'
 #' @param model A string specifying the model name (e.g., `"TUW"`), used to access the corresponding sublist in `cal_par`.
+#'   For a complete list see table in `vignette("model_overview")`.
 #' @param setting_name_value A string representing the setting to update, in the format `"sublist$parameter = value"`.
 #'   This string is parsed and evaluated to modify the calibration settings.
 #' @param cal_par A list containing calibration settings for one or more models.
@@ -2539,6 +2547,7 @@ set_cal_par <- function(model, setting_name_value, cal_par) {
 #' This includes parameter bounds and optimizer configurations for DEoptim, malschains, and hydroPSO.
 #'
 #' @param model A string specifying the airGR model (e.g., `"GR4J"`, `"CemaNeigeGR4J"`).
+#'   For a complete list see table in `vignette("model_overview")`.
 #'
 #' @return A list containing:
 #' \itemize{
@@ -2614,7 +2623,7 @@ set_airGR_par <- function(model) {
 #' and optimizer configurations for DEoptim, malschains, and hydroPSO. Supports both SMA-only and SMA-routing model combinations.
 #'
 #' @param model A string specifying the soil moisture accounting (SMA) model (e.g., `"gr4j"`, `"sacramento"`, `"snow"`),
-#'   or a pre-defined \code{hydromad} model object.
+#'   or a pre-defined \code{hydromad} model object. For a complete list see table in `vignette("model_overview")`.
 #' @param routing A string specifying the routing model (e.g., `"expuh"`, `"lambda"`). Only used if \code{model} is a string.
 #'
 #' @return A list containing:

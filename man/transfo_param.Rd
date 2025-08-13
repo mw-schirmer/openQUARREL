@@ -20,10 +20,11 @@ transfo_param(
 \code{"RT"} (real to transformed) or \code{"TR"} (transformed to real).}
 
 \item{model}{A character string specifying the hydrological model (e.g., \code{"GR4J"},
-\code{"TUW"}, \code{"CemaNeigeGR4J"}).}
+\code{"TUW"}, \code{"CemaNeigeGR4J"}).
+For a complete list see table in \code{vignette("model_overview")}.}
 
 \item{snow_module}{Optional. A character string specifying the snow module to be included
-in the transformation (e.g., \code{"CemaNeige"}).}
+in the transformation (currently \code{"CemaNeige"} and \code{"TUWsnow"}).}
 
 \item{add_snow_par}{Logical. If \code{TRUE}, snow module parameters are included in the
 transformation. Default is \code{FALSE}.}

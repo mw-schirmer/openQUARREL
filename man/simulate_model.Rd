@@ -16,7 +16,8 @@ simulate_model(
 \arguments{
 \item{model}{A string specifying the hydrological model to use. Supported models include
 \code{"TUW"}, \code{"topmodel"}, \code{"hydromad"} models (e.g., \code{"sacramento"}, \code{"cwi"}),
-and \pkg{airGR} models (e.g., \code{"GR4J"}, \code{"CemaNeigeGR4J"}).}
+and \pkg{airGR} models (e.g., \code{"GR4J"}, \code{"CemaNeigeGR4J"}).
+For a complete list see table in \code{vignette("model_overview")}.}
 
 \item{model_param}{A numeric vector of model parameters specific to the chosen model.}
 

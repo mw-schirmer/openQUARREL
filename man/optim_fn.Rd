@@ -31,11 +31,12 @@ using \code{\link{load_meteo_data}}.}
 \item{split_indices}{A list of index vectors indicating warm-up and calibration periods,
 usually from \code{\link{split_data_set}}.}
 
-\item{model}{A string specifying the hydrological model.}
+\item{model}{A string specifying the hydrological model.
+For a complete list see table in \code{vignette("model_overview")}.}
 
 \item{input}{A list of model input data, typically created using \code{\link{create_input}}.}
 
-\item{snow_module}{Optional. A string specifying the snow module (e.g., \code{"CemaNeige"}).}
+\item{snow_module}{Optional. A string specifying the snow module (currently \code{"CemaNeige"} and \code{"TUWsnow"}).}
 
 \item{snow_input}{Optional. Input data for the snow module.}
 

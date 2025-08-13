@@ -7,7 +7,8 @@
 create_input(model, BasinObs, BasinInfo)
 }
 \arguments{
-\item{model}{A string specifying the hydrological model (e.g., \code{"GR4J"}, \code{"TUW"}, \code{"topmodel"}).}
+\item{model}{A string specifying the hydrological model (e.g., \code{"GR4J"}, \code{"TUW"}, \code{"topmodel"}).
+For a complete list see table in \code{vignette("model_overview")}.}
 
 \item{BasinObs}{A data frame containing time series of meteorological and hydrological data,
 typically created using \code{\link{load_meteo_data}}.}

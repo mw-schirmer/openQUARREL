@@ -15,7 +15,8 @@ save_airGR_plot(
 \arguments{
 \item{file}{A string specifying the filename for the saved plot (e.g., \code{"airGR_plot.pdf"}).}
 
-\item{model}{A string indicating the model name (e.g., \code{"CemaNeigeGR4J"}), used to determine if the model is from the airGR family.}
+\item{model}{A string indicating the model name (e.g., \code{"CemaNeigeGR4J"}), used to determine if the model is from the airGR family.
+For a complete list see table in \code{vignette("model_overview")}.}
 
 \item{simulation_results}{A list containing simulation outputs, typically from \code{\link{simulate_model}}.
 Must include at least \code{Qsim}, \code{Qobs}, and optionally snow-related variables like \code{SWE}, \code{psolid}, and \code{pliquid}.}
