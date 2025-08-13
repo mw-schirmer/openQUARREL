@@ -32,14 +32,9 @@ package, and applies the great plots of
 [airGR](https://hydrogr.github.io/airGR/index.html) to models of other
 packages.
 
-<figure>
-<img src="man/figures/openQUARREL_overview.png" alt="Overview" />
-<figcaption aria-hidden="true">Overview</figcaption>
-</figure>
+![](man/figures/openQUARREL_overview.png)
 
 ## Installation
-
-You can install the development version of openQUARREL like so:
 
 Currently, it is dependent on airGR version 1.6.12 and hydromad 0.9-26.
 The author is currently contacting the developers to also being able to
@@ -60,7 +55,7 @@ like so:
 install.packages("https://cran.r-project.org/src/contrib/Archive/topmodel/topmodel_0.7.5.tar.gz", repos = NULL, type = "source")
 ```
 
-Now you can install openQUARREL. \[!NOTE\] Choose “3: None” after the
+Now you can install openQUARREL. **Note:** Choose “3: None” after the
 prompt to not update your packages after this command as this will also
 update airGR (on CRAN) and hydromad (on github).
 

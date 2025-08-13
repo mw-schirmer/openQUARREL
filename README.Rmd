@@ -25,11 +25,9 @@ An R meta-package of lumped conceptual models was developed based on the review 
 
 It heavily relies on external packages as the [airGR](https://hydrogr.github.io/airGR/index.html), [hydromad](https://hydromad.github.io/index.html), [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html) and [topmodel](https://github.com/ICHydro/topmodel) with their hydrological models. Similarly, for calibration external packages are integrated as [DEoptim](https://cran.r-project.org/web/packages/DEoptim/index.html), [hydroPSO](https://github.com/hzambran/hydroPSO) and others. For objective functions it uses the [hydroGOF](https://cran.r-project.org/web/packages/hydroGOF/index.html) package, and applies the great plots of [airGR](https://hydrogr.github.io/airGR/index.html) to models of other packages.
 
-![Overview](man/figures/openQUARREL_overview.png)
+![](man/figures/openQUARREL_overview.png)
 
 ## Installation
-
-You can install the development version of openQUARREL like so:
 
 Currently, it is dependent on airGR version 1.6.12 and hydromad 0.9-26. The author is currently contacting the developers to also being able to include their newest versions. The hydromad package is automatically installed from their github folder using the [oldstable](https://github.com/hydromad/hydromad/tree/oldstable) branch. The airGR package version 1.6.12 needs to be installed from CRAN archive like this, previously to the installation of openQUARREL:
 
@@ -43,7 +41,8 @@ Similarly, topmodel was recently removed from CRAN and can be installed like so:
 install.packages("https://cran.r-project.org/src/contrib/Archive/topmodel/topmodel_0.7.5.tar.gz", repos = NULL, type = "source")
 ```
 
-Now you can install openQUARREL. [!NOTE] Choose "3: None" after the prompt to not update your packages after this command as this will also update airGR (on CRAN) and hydromad (on github).
+Now you can install openQUARREL. 
+**Note:** Choose "3: None" after the prompt to not update your packages after this command as this will also update airGR (on CRAN) and hydromad (on github).
 
 ```{r install openQUARREL, eval=FALSE}
 remotes::install_github("mw-schirmer/openQUARREL", dependencies = TRUE)
