@@ -12,9 +12,9 @@
 
 <meta name="author" content="Michael Schirmer" />
 
-<meta name="date" content="2025-08-11" />
+<meta name="date" content="2025-08-13" />
 
-<title>Calibrate and validate hydrological models</title>
+<title>Calibration and validation</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -338,288 +338,172 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Calibrate and validate hydrological
-models</h1>
+<h1 class="title toc-ignore">Calibration and validation</h1>
 <h4 class="author">Michael Schirmer</h4>
-<h4 class="date">2025-08-11</h4>
+<h4 class="date">2025-08-13</h4>
 
 
 
-<div id="user-settings" class="section level2">
-<h2>User settings</h2>
+<p>This vignette shows how to calibrate and validate a hydrological
+model</p>
+<div id="preparations" class="section level2">
+<h2>Preparations</h2>
+<p>Do first vignette until (excluding) Run the model</p>
+</div>
+<div id="preparations-1" class="section level2">
+<h2>Preparations</h2>
+<div id="load-packages" class="section level3">
+<h3>Load packages</h3>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(openQUARREL)</span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># check if this is needed after loading my pacckage</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(tictoc)</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(hydroGOF)</span>
-<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co"># Settings ---------------------------------</span></span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co"># set and create base directory for output, choose an appropriate folder</span></span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>base_folder <span class="ot">&lt;-</span> <span class="st">&quot;C:/openQuarrel/vignette&quot;</span></span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a><span class="fu">dir.create</span>(base_folder, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">setwd</span>(base_folder)</span>
-<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co"># catchment settings</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>HSU_ID <span class="ot">&lt;-</span> <span class="st">&quot;2303&quot;</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co"># use default calibration settings</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>cal_par <span class="ot">&lt;-</span> default_cal_par</span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="co"># model settings</span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co"># model_list = c(&quot;CemaNeigeGR4J&quot;, &quot;CemaNeigeGR5J&quot;, &quot;CemaNeigeGR6J&quot;, &quot;TUW&quot;)</span></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>model_list <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;TUW&quot;</span>)</span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co"># calibration settings</span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="co"># todo: call it cal_crit_transfo_vec, and elsewhere also vec</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>error_crit_transfo_list <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;KGE__none&quot;</span>)</span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="co"># error_crit_transfo_list &lt;- c(&quot;KGE__none&quot;, &quot;KGEtang__log&quot;,&quot;KGE__power__0.2&quot;, &quot;KGE__power__-0.5&quot;, &quot;KGE__boxcoxsantos&quot;)</span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>cal_maximize <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>cal_fn_list <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;steepest_descent&quot;</span>)</span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co"># these are all possible choices, not that Calibration_Michel can only by applied to airGR models</span></span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="co"># cal_fn_list &lt;- c(&quot;Calibration_Michel&quot;, &quot;steepest_descent&quot;, &quot;montecarlo__random__1000&quot;, &quot;montecarlo__lhs__1000&quot;, &quot;montecarlo__sobol__1000&quot;,</span></span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="co">#                  &quot;nlminb&quot;, &quot;optim&quot;, &quot;nlminb__random__100&quot;, &quot;optim__random__100&quot;,</span></span>
-<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="co">#                  &quot;DEoptim&quot;, &quot;hydroPSO&quot;, &quot;malschains&quot;)</span></span>
-<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="co"># if parameter space should be transformed during calibration</span></span>
-<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a>do_transfo_param <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
-<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co"># validation settings</span></span>
-<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a>val_crit_transfo <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;KGE__none&quot;</span>, <span class="st">&quot;NSE__none&quot;</span>, <span class="st">&quot;VE__none&quot;</span>, <span class="st">&quot;pbias__none&quot;</span>, <span class="st">&quot;mae__none&quot;</span>, <span class="st">&quot;mse__none&quot;</span>,</span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a>                      <span class="st">&quot;KGE__power__0.2&quot;</span>,  <span class="st">&quot;NSE__power__0.2&quot;</span>, <span class="st">&quot;mae__power__0.2&quot;</span>, <span class="st">&quot;mse__power__0.2&quot;</span>,</span>
-<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a>                      <span class="st">&quot;KGE__boxcoxsantos&quot;</span>, <span class="st">&quot;NSE__boxcoxsantos&quot;</span>, <span class="st">&quot;mae__boxcoxsantos&quot;</span>, <span class="st">&quot;mse__boxcoxsantos&quot;</span>,</span>
-<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a>                      <span class="st">&quot;KGEtang__log&quot;</span>, <span class="st">&quot;NSE__log&quot;</span>, <span class="st">&quot;mae__log&quot;</span>, <span class="st">&quot;mse__log&quot;</span>,</span>
-<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a>                      <span class="st">&quot;KGE__power__-0.5&quot;</span>, <span class="st">&quot;NSE__power__-0.5&quot;</span>, <span class="st">&quot;mae__power__-0.5&quot;</span>, <span class="st">&quot;mse__power__-0.5&quot;</span>)</span>
-<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a><span class="co"># a list with names and arrays of two digits describing months used to calculate</span></span>
-<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a><span class="co"># subseasonal validation metrics</span></span>
-<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a>val_subseason <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">spring =</span> <span class="fu">c</span>(<span class="st">&quot;02&quot;</span>, <span class="st">&quot;03&quot;</span>, <span class="st">&quot;04&quot;</span>, <span class="st">&quot;05&quot;</span>), </span>
-<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a>                      <span class="at">summer =</span> <span class="fu">c</span>(<span class="st">&quot;06&quot;</span>, <span class="st">&quot;07&quot;</span>, <span class="st">&quot;08&quot;</span>, <span class="st">&quot;09&quot;</span>)) </span>
-<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a><span class="co"># for no subseasonal values take</span></span>
-<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a><span class="co"># val_subseason &lt;- list()</span></span></code></pre></div>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
 </div>
-<div id="functions" class="section level2">
-<h2>functions</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co"># tic toc message</span></span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>msg_toc <span class="ot">&lt;-</span> <span class="cf">function</span>(tic, toc, msg, info1, info2, info3) {</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  outmsg <span class="ot">&lt;-</span> <span class="fu">paste0</span>(info1, <span class="st">&quot; &gt; &quot;</span>, msg, <span class="st">&quot; &gt; &quot;</span>, <span class="fu">round</span>(toc <span class="sc">-</span> tic, <span class="dv">3</span>), <span class="st">&quot; seconds elapsed &quot;</span>, info2, <span class="st">&quot; with best crit: &quot;</span> , <span class="fu">round</span>(info3, <span class="dv">3</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>}</span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># wrapper function, todo exclude this from package and put this to future_water_model</span></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># todo: adapt to different input</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>calibrate_validate <span class="ot">&lt;-</span> <span class="cf">function</span>(model, input_data, basin_data, HSU_ID, </span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>                               error_crit_transfo, cal_maximize, cal_fn,</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>                               <span class="at">do_transfo_param =</span> <span class="cn">FALSE</span>, <span class="at">cal_parameters =</span> cal_par,</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>                               <span class="at">val_crit_transfo =</span> <span class="st">&quot;KGE_none&quot;</span>, <span class="at">val_subseason =</span> <span class="fu">list</span>(),</span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>                               <span class="at">snow_module =</span> <span class="cn">NULL</span>, <span class="at">snow_parameters =</span> <span class="cn">NULL</span>) {</span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>   </span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>  <span class="co"># calibrate and validate on main catchment -----------------------------------</span></span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="co"># subset data</span></span>
-<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>  hydro_data <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>  hydro_data<span class="sc">$</span>BasinObs <span class="ot">&lt;-</span> input_data <span class="sc">%&gt;%</span> <span class="fu">filter</span>(FOEN_ID <span class="sc">==</span> HSU_ID)</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  hydro_data<span class="sc">$</span>BasinInfo <span class="ot">&lt;-</span> basin_data[[HSU_ID]]</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>  </span>
-<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>  <span class="co"># convert Date to POSIXct</span></span>
-<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>  <span class="co"># todo: put it into input_data already</span></span>
-<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  hydro_data<span class="sc">$</span>BasinObs<span class="sc">$</span>DatesR <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(hydro_data<span class="sc">$</span>BasinObs<span class="sc">$</span>DatesR)</span>
-<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>  <span class="fu">attr</span>(hydro_data<span class="sc">$</span>BasinObs<span class="sc">$</span>DatesR, <span class="st">&quot;tzone&quot;</span>) <span class="ot">&lt;-</span> <span class="st">&quot;UTC&quot;</span></span>
-<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>  </span>
-<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  <span class="co"># create input dependent on model</span></span>
-<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>  input <span class="ot">&lt;-</span> <span class="fu">create_input</span>(model, hydro_data<span class="sc">$</span>BasinObs, hydro_data<span class="sc">$</span>BasinInfo)</span>
-<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a></span>
-<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>  <span class="co"># split data set</span></span>
-<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a>  split_indices <span class="ot">&lt;-</span> <span class="fu">split_data_set</span>(</span>
-<span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a>    hydro_data<span class="sc">$</span>BasinObs,</span>
-<span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a>    <span class="fu">c</span>(<span class="st">&quot;1981-01-01&quot;</span>, <span class="st">&quot;1982-12-31&quot;</span>, <span class="st">&quot;1983-01-01&quot;</span>, <span class="st">&quot;2000-12-31&quot;</span>, <span class="st">&quot;2001-01-01&quot;</span>, <span class="st">&quot;2020-12-31&quot;</span>)</span>
-<span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a>  )</span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a>  </span>
-<span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a>  <span class="co"># start time measuring for calibration</span></span>
-<span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a>  <span class="fu">tic</span>(<span class="at">msg =</span> <span class="fu">paste</span>(model, snow_module, cal_fn, error_crit_transfo), <span class="at">quiet =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a>  </span>
-<span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a>  <span class="co"># create snow module and input</span></span>
-<span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(snow_module)) {</span>
-<span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a>    <span class="co"># create snow input</span></span>
-<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a>    snow_input <span class="ot">&lt;-</span> <span class="fu">create_input</span>(snow_module, hydro_data<span class="sc">$</span>BasinObs, hydro_data<span class="sc">$</span>BasinInfo)</span>
-<span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a>  }</span>
-<span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a>  </span>
-<span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a>  <span class="co"># todo: redundant meteo data, in hydro_data and in input, provide only BasinInfo if possible</span></span>
-<span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a>  calibration_results <span class="ot">&lt;-</span> <span class="fu">calibrate_model</span>(</span>
-<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a>    hydro_data, split_indices, model, input,</span>
-<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a>    snow_module, snow_input, snow_parameters,</span>
-<span id="cb2-50"><a href="#cb2-50" tabindex="-1"></a>    error_crit_transfo, cal_maximize,</span>
-<span id="cb2-51"><a href="#cb2-51" tabindex="-1"></a>    cal_fn, do_transfo_param, cal_par</span>
-<span id="cb2-52"><a href="#cb2-52" tabindex="-1"></a>  )</span>
-<span id="cb2-53"><a href="#cb2-53" tabindex="-1"></a>  </span>
-<span id="cb2-54"><a href="#cb2-54" tabindex="-1"></a>  </span>
-<span id="cb2-55"><a href="#cb2-55" tabindex="-1"></a>  <span class="co">#  check if calibration results are available</span></span>
-<span id="cb2-56"><a href="#cb2-56" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(calibration_results)) {</span>
-<span id="cb2-57"><a href="#cb2-57" tabindex="-1"></a>    </span>
-<span id="cb2-58"><a href="#cb2-58" tabindex="-1"></a>    <span class="co"># write log file and to console, for all calibrations in this catchment -----------</span></span>
-<span id="cb2-59"><a href="#cb2-59" tabindex="-1"></a>    <span class="co"># name the run, i.e. a combination of snow module and hydro module</span></span>
-<span id="cb2-60"><a href="#cb2-60" tabindex="-1"></a>    model_comb <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(<span class="fu">is.null</span>(snow_module), model, <span class="fu">paste0</span>(snow_module, <span class="st">&quot;__&quot;</span>, model))</span>
-<span id="cb2-61"><a href="#cb2-61" tabindex="-1"></a>    </span>
-<span id="cb2-62"><a href="#cb2-62" tabindex="-1"></a>    <span class="co"># this line provides an console output</span></span>
-<span id="cb2-63"><a href="#cb2-63" tabindex="-1"></a>    mytoc <span class="ot">&lt;-</span> <span class="fu">toc</span>(<span class="at">func.toc =</span> msg_toc, <span class="at">info1 =</span> <span class="fu">Sys.time</span>(), <span class="at">info2 =</span> <span class="st">&quot;for calibration&quot;</span>, <span class="at">info3 =</span> calibration_results<span class="sc">$</span>error_crit_val)</span>
-<span id="cb2-64"><a href="#cb2-64" tabindex="-1"></a>    <span class="co"># this lines write to file</span></span>
-<span id="cb2-65"><a href="#cb2-65" tabindex="-1"></a>    <span class="fu">write</span>(<span class="fu">msg_toc</span>(mytoc<span class="sc">$</span>tic, mytoc<span class="sc">$</span>toc, mytoc<span class="sc">$</span>msg, <span class="at">info1 =</span> <span class="fu">Sys.time</span>(), <span class="at">info2 =</span> <span class="st">&quot;for calibration&quot;</span>, <span class="at">info3 =</span> calibration_results<span class="sc">$</span>error_crit_val),</span>
-<span id="cb2-66"><a href="#cb2-66" tabindex="-1"></a>          <span class="at">file =</span> <span class="fu">file.path</span>(base_folder, <span class="fu">paste0</span>(<span class="st">&quot;log_&quot;</span>, HSU_ID, <span class="st">&quot;.txt&quot;</span>)), <span class="at">append =</span> <span class="cn">TRUE</span></span>
-<span id="cb2-67"><a href="#cb2-67" tabindex="-1"></a>    )</span>
-<span id="cb2-68"><a href="#cb2-68" tabindex="-1"></a> </span>
-<span id="cb2-69"><a href="#cb2-69" tabindex="-1"></a>    <span class="co"># save parameters --------------------------------</span></span>
-<span id="cb2-70"><a href="#cb2-70" tabindex="-1"></a>    <span class="co"># create output folder for this specific calibration</span></span>
-<span id="cb2-71"><a href="#cb2-71" tabindex="-1"></a>    output_folder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(</span>
-<span id="cb2-72"><a href="#cb2-72" tabindex="-1"></a>      base_folder, HSU_ID, </span>
-<span id="cb2-73"><a href="#cb2-73" tabindex="-1"></a>      model_comb, cal_fn, error_crit_transfo</span>
-<span id="cb2-74"><a href="#cb2-74" tabindex="-1"></a>    )</span>
-<span id="cb2-75"><a href="#cb2-75" tabindex="-1"></a>    parameter_folder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_folder, <span class="st">&quot;model_parameters&quot;</span>)</span>
-<span id="cb2-76"><a href="#cb2-76" tabindex="-1"></a>    <span class="fu">dir.create</span>(parameter_folder, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-77"><a href="#cb2-77" tabindex="-1"></a>    readr<span class="sc">::</span><span class="fu">write_rds</span>(calibration_results<span class="sc">$</span>model_param,</span>
-<span id="cb2-78"><a href="#cb2-78" tabindex="-1"></a>                     <span class="fu">file.path</span>(parameter_folder, <span class="fu">paste0</span>(HSU_ID, <span class="st">&quot;.rds&quot;</span>))</span>
-<span id="cb2-79"><a href="#cb2-79" tabindex="-1"></a>    )</span>
-<span id="cb2-80"><a href="#cb2-80" tabindex="-1"></a>    </span>
-<span id="cb2-81"><a href="#cb2-81" tabindex="-1"></a>    </span>
-<span id="cb2-82"><a href="#cb2-82" tabindex="-1"></a>    <span class="co"># simulate whole period for plots and quality metrics  ------------------</span></span>
-<span id="cb2-83"><a href="#cb2-83" tabindex="-1"></a>    <span class="co"># retrieve model param</span></span>
-<span id="cb2-84"><a href="#cb2-84" tabindex="-1"></a>    runoff_param <span class="ot">&lt;-</span> calibration_results<span class="sc">$</span>model_param</span>
-<span id="cb2-85"><a href="#cb2-85" tabindex="-1"></a>    </span>
-<span id="cb2-86"><a href="#cb2-86" tabindex="-1"></a>    <span class="co"># retrieve snow module param and update precipitation input</span></span>
-<span id="cb2-87"><a href="#cb2-87" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(snow_module)) {</span>
-<span id="cb2-88"><a href="#cb2-88" tabindex="-1"></a>      </span>
-<span id="cb2-89"><a href="#cb2-89" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">is.null</span>(snow_parameters)) {</span>
-<span id="cb2-90"><a href="#cb2-90" tabindex="-1"></a>        nof_param_snow <span class="ot">&lt;-</span> cal_par[[snow_module]][[<span class="st">&quot;nof_param&quot;</span>]]</span>
-<span id="cb2-91"><a href="#cb2-91" tabindex="-1"></a>        snow_param <span class="ot">&lt;-</span> calibration_results<span class="sc">$</span>model_param[<span class="dv">1</span><span class="sc">:</span>nof_param_snow]</span>
-<span id="cb2-92"><a href="#cb2-92" tabindex="-1"></a>        <span class="co"># remaining runoff model parameters</span></span>
-<span id="cb2-93"><a href="#cb2-93" tabindex="-1"></a>        runoff_param <span class="ot">&lt;-</span> calibration_results<span class="sc">$</span>model_param[(nof_param_snow <span class="sc">+</span> <span class="dv">1</span>)<span class="sc">:</span><span class="fu">length</span>(calibration_results<span class="sc">$</span>model_param)]</span>
-<span id="cb2-94"><a href="#cb2-94" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
-<span id="cb2-95"><a href="#cb2-95" tabindex="-1"></a>        <span class="co"># add snow parameters for storing</span></span>
-<span id="cb2-96"><a href="#cb2-96" tabindex="-1"></a>        calibration_results<span class="sc">$</span>model_param <span class="ot">&lt;-</span> <span class="fu">c</span>(snow_parameters, calibration_results<span class="sc">$</span>model_param)</span>
-<span id="cb2-97"><a href="#cb2-97" tabindex="-1"></a>      }</span>
-<span id="cb2-98"><a href="#cb2-98" tabindex="-1"></a>      </span>
-<span id="cb2-99"><a href="#cb2-99" tabindex="-1"></a>      <span class="co"># model solid precipitation</span></span>
-<span id="cb2-100"><a href="#cb2-100" tabindex="-1"></a>      <span class="co"># ensure that P is present in input</span></span>
-<span id="cb2-101"><a href="#cb2-101" tabindex="-1"></a>      <span class="cf">if</span> (<span class="sc">!</span><span class="st">&quot;P&quot;</span> <span class="sc">%in%</span> <span class="fu">names</span>(input)) <span class="fu">stop</span>(<span class="st">&quot;P is not an entry of a list like input&quot;</span>)</span>
-<span id="cb2-102"><a href="#cb2-102" tabindex="-1"></a>      snow_module_results <span class="ot">&lt;-</span> <span class="fu">simulate_snow</span>(snow_module, snow_param, snow_input)</span>
-<span id="cb2-103"><a href="#cb2-103" tabindex="-1"></a>      </span>
-<span id="cb2-104"><a href="#cb2-104" tabindex="-1"></a>      <span class="co"># update precipitation with snow module surface water runoff</span></span>
-<span id="cb2-105"><a href="#cb2-105" tabindex="-1"></a>      input<span class="sc">$</span>P <span class="ot">&lt;-</span> snow_module_results<span class="sc">$</span>surface_water_runoff</span>
-<span id="cb2-106"><a href="#cb2-106" tabindex="-1"></a>      </span>
-<span id="cb2-107"><a href="#cb2-107" tabindex="-1"></a>    }</span>
-<span id="cb2-108"><a href="#cb2-108" tabindex="-1"></a>    </span>
-<span id="cb2-109"><a href="#cb2-109" tabindex="-1"></a>    <span class="co"># observed runoff</span></span>
-<span id="cb2-110"><a href="#cb2-110" tabindex="-1"></a>    Qobs <span class="ot">&lt;-</span> hydro_data<span class="sc">$</span>BasinObs<span class="sc">$</span>Qmm</span>
-<span id="cb2-111"><a href="#cb2-111" tabindex="-1"></a>    </span>
-<span id="cb2-112"><a href="#cb2-112" tabindex="-1"></a>    <span class="co"># now run model</span></span>
-<span id="cb2-113"><a href="#cb2-113" tabindex="-1"></a>    simulation_results <span class="ot">&lt;-</span> <span class="fu">simulate_model</span>(model, runoff_param, input, <span class="at">Qobs =</span> Qobs)</span>
-<span id="cb2-114"><a href="#cb2-114" tabindex="-1"></a>    </span>
-<span id="cb2-115"><a href="#cb2-115" tabindex="-1"></a>    <span class="co"># merge snow module results with runoff results</span></span>
-<span id="cb2-116"><a href="#cb2-116" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(snow_module)) {</span>
-<span id="cb2-117"><a href="#cb2-117" tabindex="-1"></a>      simulation_results <span class="ot">&lt;-</span> <span class="fu">merge_snow_runoff_sim</span>(simulation_results, snow_module_results)</span>
-<span id="cb2-118"><a href="#cb2-118" tabindex="-1"></a>    }</span>
-<span id="cb2-119"><a href="#cb2-119" tabindex="-1"></a>    </span>
-<span id="cb2-120"><a href="#cb2-120" tabindex="-1"></a>    <span class="co"># performance metrics -------------------------</span></span>
-<span id="cb2-121"><a href="#cb2-121" tabindex="-1"></a>    validation_results <span class="ot">&lt;-</span> <span class="cn">NA</span> <span class="co"># initialize</span></span>
-<span id="cb2-122"><a href="#cb2-122" tabindex="-1"></a>    </span>
-<span id="cb2-123"><a href="#cb2-123" tabindex="-1"></a>    <span class="co"># calculate performance metrics for calibration period</span></span>
-<span id="cb2-124"><a href="#cb2-124" tabindex="-1"></a>    perf_cal <span class="ot">&lt;-</span> <span class="fu">calc_subseasonal_validation_results</span>(val_subseason, hydro_data<span class="sc">$</span>BasinObs<span class="sc">$</span>DatesR,</span>
-<span id="cb2-125"><a href="#cb2-125" tabindex="-1"></a>                                                    split_indices<span class="sc">$</span>ind_cal, <span class="st">&quot;calibration&quot;</span>,</span>
-<span id="cb2-126"><a href="#cb2-126" tabindex="-1"></a>                                                    <span class="at">col_name =</span> <span class="st">&quot;period&quot;</span>,</span>
-<span id="cb2-127"><a href="#cb2-127" tabindex="-1"></a>                                                    simulation_results<span class="sc">$</span>Qsim, Qobs, val_crit_transfo</span>
-<span id="cb2-128"><a href="#cb2-128" tabindex="-1"></a>    )</span>
-<span id="cb2-129"><a href="#cb2-129" tabindex="-1"></a>    </span>
-<span id="cb2-130"><a href="#cb2-130" tabindex="-1"></a>    <span class="co"># calculate performance metrics for calibration period</span></span>
-<span id="cb2-131"><a href="#cb2-131" tabindex="-1"></a>    perf_val <span class="ot">&lt;-</span> <span class="fu">calc_subseasonal_validation_results</span>(val_subseason, hydro_data<span class="sc">$</span>BasinObs<span class="sc">$</span>DatesR,</span>
-<span id="cb2-132"><a href="#cb2-132" tabindex="-1"></a>                                                    split_indices<span class="sc">$</span>ind_val, <span class="st">&quot;validation&quot;</span>,</span>
-<span id="cb2-133"><a href="#cb2-133" tabindex="-1"></a>                                                    <span class="at">col_name =</span> <span class="st">&quot;period&quot;</span>,</span>
-<span id="cb2-134"><a href="#cb2-134" tabindex="-1"></a>                                                    simulation_results<span class="sc">$</span>Qsim, Qobs, val_crit_transfo</span>
-<span id="cb2-135"><a href="#cb2-135" tabindex="-1"></a>    )</span>
-<span id="cb2-136"><a href="#cb2-136" tabindex="-1"></a>    </span>
-<span id="cb2-137"><a href="#cb2-137" tabindex="-1"></a>    <span class="co"># combine periods in one data frame</span></span>
-<span id="cb2-138"><a href="#cb2-138" tabindex="-1"></a>    validation_results <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(perf_cal, perf_val)</span>
-<span id="cb2-139"><a href="#cb2-139" tabindex="-1"></a>    </span>
-<span id="cb2-140"><a href="#cb2-140" tabindex="-1"></a>    </span>
-<span id="cb2-141"><a href="#cb2-141" tabindex="-1"></a>    <span class="co"># save all data ------------------------</span></span>
-<span id="cb2-142"><a href="#cb2-142" tabindex="-1"></a>    ind_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb2-143"><a href="#cb2-143" tabindex="-1"></a>    ind_list<span class="sc">$</span>cal <span class="ot">&lt;-</span> split_indices<span class="sc">$</span>ind_cal</span>
-<span id="cb2-144"><a href="#cb2-144" tabindex="-1"></a>    ind_list<span class="sc">$</span>val <span class="ot">&lt;-</span> split_indices<span class="sc">$</span>ind_val</span>
-<span id="cb2-145"><a href="#cb2-145" tabindex="-1"></a>    </span>
-<span id="cb2-146"><a href="#cb2-146" tabindex="-1"></a>    <span class="co"># split results in calibration and validation period</span></span>
-<span id="cb2-147"><a href="#cb2-147" tabindex="-1"></a>    simulation_results_list <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(ind_list, <span class="sc">~</span> <span class="fu">subset_simulations</span>(.x, simulation_results))</span>
-<span id="cb2-148"><a href="#cb2-148" tabindex="-1"></a>    </span>
-<span id="cb2-149"><a href="#cb2-149" tabindex="-1"></a>    <span class="co"># save binary results</span></span>
-<span id="cb2-150"><a href="#cb2-150" tabindex="-1"></a>    binary_folder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_folder, <span class="st">&quot;binary&quot;</span>)</span>
-<span id="cb2-151"><a href="#cb2-151" tabindex="-1"></a>    <span class="fu">dir.create</span>(binary_folder, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-152"><a href="#cb2-152" tabindex="-1"></a>    readr<span class="sc">::</span><span class="fu">write_rds</span>(</span>
-<span id="cb2-153"><a href="#cb2-153" tabindex="-1"></a>      <span class="fu">list</span>(</span>
-<span id="cb2-154"><a href="#cb2-154" tabindex="-1"></a>        <span class="at">calibration =</span> calibration_results,</span>
-<span id="cb2-155"><a href="#cb2-155" tabindex="-1"></a>        <span class="at">simulation_val =</span> simulation_results_list<span class="sc">$</span>val,</span>
-<span id="cb2-156"><a href="#cb2-156" tabindex="-1"></a>        <span class="at">simulation_cal =</span> simulation_results_list<span class="sc">$</span>cal,</span>
-<span id="cb2-157"><a href="#cb2-157" tabindex="-1"></a>        <span class="at">sim_more_info =</span> simulation_results<span class="sc">$</span>more_info,</span>
-<span id="cb2-158"><a href="#cb2-158" tabindex="-1"></a>        <span class="at">validation =</span> validation_results</span>
-<span id="cb2-159"><a href="#cb2-159" tabindex="-1"></a>      ),</span>
-<span id="cb2-160"><a href="#cb2-160" tabindex="-1"></a>      <span class="fu">file.path</span>(binary_folder, <span class="fu">paste0</span>(HSU_ID, <span class="st">&quot;.rds&quot;</span>))</span>
-<span id="cb2-161"><a href="#cb2-161" tabindex="-1"></a>    )</span>
-<span id="cb2-162"><a href="#cb2-162" tabindex="-1"></a>    </span>
-<span id="cb2-163"><a href="#cb2-163" tabindex="-1"></a>    <span class="co"># write ascii results overview</span></span>
-<span id="cb2-164"><a href="#cb2-164" tabindex="-1"></a>    ascii_folder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_folder, <span class="st">&quot;ascii&quot;</span>)</span>
-<span id="cb2-165"><a href="#cb2-165" tabindex="-1"></a>    <span class="fu">dir.create</span>(ascii_folder, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-166"><a href="#cb2-166" tabindex="-1"></a>    </span>
-<span id="cb2-167"><a href="#cb2-167" tabindex="-1"></a>    <span class="fu">write_ascii</span>(</span>
-<span id="cb2-168"><a href="#cb2-168" tabindex="-1"></a>      <span class="fu">file.path</span>(ascii_folder, <span class="fu">paste0</span>(HSU_ID, <span class="st">&quot;.txt&quot;</span>)),</span>
-<span id="cb2-169"><a href="#cb2-169" tabindex="-1"></a>      calibration_results, validation_results</span>
-<span id="cb2-170"><a href="#cb2-170" tabindex="-1"></a>    )</span>
-<span id="cb2-171"><a href="#cb2-171" tabindex="-1"></a>    </span>
-<span id="cb2-172"><a href="#cb2-172" tabindex="-1"></a>    <span class="co"># save  plots --------------------------</span></span>
-<span id="cb2-173"><a href="#cb2-173" tabindex="-1"></a>    figure_folder <span class="ot">&lt;-</span> <span class="fu">file.path</span>(output_folder, <span class="st">&quot;figures&quot;</span>)</span>
-<span id="cb2-174"><a href="#cb2-174" tabindex="-1"></a>    <span class="fu">dir.create</span>(figure_folder, <span class="at">recursive =</span> <span class="cn">TRUE</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-175"><a href="#cb2-175" tabindex="-1"></a>    </span>
-<span id="cb2-176"><a href="#cb2-176" tabindex="-1"></a>    <span class="co"># calibration validation overview plot</span></span>
-<span id="cb2-177"><a href="#cb2-177" tabindex="-1"></a>    <span class="fu">save_cal_val_plot</span>(</span>
-<span id="cb2-178"><a href="#cb2-178" tabindex="-1"></a>      <span class="fu">file.path</span>(figure_folder, <span class="fu">paste0</span>(HSU_ID, <span class="st">&quot;_cal_val.pdf&quot;</span>)),</span>
-<span id="cb2-179"><a href="#cb2-179" tabindex="-1"></a>      hydro_data<span class="sc">$</span>BasinObs, simulation_results<span class="sc">$</span>Qsim, split_indices</span>
-<span id="cb2-180"><a href="#cb2-180" tabindex="-1"></a>    )</span>
-<span id="cb2-181"><a href="#cb2-181" tabindex="-1"></a>    </span>
-<span id="cb2-182"><a href="#cb2-182" tabindex="-1"></a>    </span>
-<span id="cb2-183"><a href="#cb2-183" tabindex="-1"></a>    <span class="co"># airGR plots for validation and calibration time period</span></span>
-<span id="cb2-184"><a href="#cb2-184" tabindex="-1"></a>    purrr<span class="sc">::</span><span class="fu">pwalk</span>(<span class="fu">list</span>(ind_list, <span class="fu">names</span>(ind_list)),</span>
-<span id="cb2-185"><a href="#cb2-185" tabindex="-1"></a>                 <span class="sc">~</span> <span class="fu">save_airGR_plot</span>(<span class="fu">file.path</span>(figure_folder, <span class="fu">paste0</span>(HSU_ID, <span class="st">&quot;_airGR_&quot;</span>, .y, <span class="st">&quot;.pdf&quot;</span>)),</span>
-<span id="cb2-186"><a href="#cb2-186" tabindex="-1"></a>                                   model, simulation_results, .x, hydro_data</span>
-<span id="cb2-187"><a href="#cb2-187" tabindex="-1"></a>                 ))</span>
-<span id="cb2-188"><a href="#cb2-188" tabindex="-1"></a>  }</span>
-<span id="cb2-189"><a href="#cb2-189" tabindex="-1"></a>}</span></code></pre></div>
+<div id="load-data" class="section level3">
+<h3>Load data</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">data</span>(input_data)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">data</span>(basin_data)</span></code></pre></div>
 </div>
-<div id="load-data" class="section level2">
-<h2>load data</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># todo: get rid of Qm3s as this is not required </span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">data</span>(input_data)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># todo: put a meaninful id name already in the input</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>input_data <span class="ot">&lt;-</span> input_data <span class="sc">%&gt;%</span> <span class="fu">rename</span>(<span class="at">FOEN_ID =</span> HSU_ID)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># todo: get rid of HypsoData as this is not required</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">data</span>(basin_data)</span></code></pre></div>
+<div id="create-a-minimum-input-now-with-observed-streamflow" class="section level3">
+<h3>Create a minimum input, now with observed streamflow</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># can be done as separate data set</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>minimum_input <span class="ot">&lt;-</span> input_data <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="fu">filter</span>(HSU_ID <span class="sc">==</span> <span class="st">&quot;2303&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">select</span>(DatesR, P, T, E, Qmm)</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>minimum_basin_info <span class="ot">&lt;-</span> basin_data[[<span class="st">&quot;2303&quot;</span>]]</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># todo: delete HypsoData in general</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>minimum_basin_info<span class="sc">$</span>HypsoData <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># convert Date to POSIXct</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co"># todo: put it into input_data already, but is also good to show it here</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>minimum_input<span class="sc">$</span>DatesR <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(minimum_input<span class="sc">$</span>DatesR)</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="fu">attr</span>(minimum_input<span class="sc">$</span>DatesR, <span class="st">&quot;tzone&quot;</span>) <span class="ot">&lt;-</span> <span class="st">&quot;UTC&quot;</span></span></code></pre></div>
+<p>The data frame <code>minimum_input</code> contains columns
+<code>P</code> for precipitation in mm/d, <code>T</code> for air
+temperature in degrees Celsius and <code>E</code> for potential
+evapotranspiration in mm/d. See also the great <a href="https://hydrogr.github.io/airGR/page_1_get_started.html">airGR get
+started</a> documentation. If you need to calculate <code>E</code>,
+there are functions available, e.g. in <a href="https://rdrr.io/cran/airGR/man/PE_Oudin.html">airGR::PE_Oudin</a>.</p>
+<table>
+<thead>
+<tr>
+<th align="left">DatesR</th>
+<th align="right">P</th>
+<th align="right">T</th>
+<th align="right">E</th>
+<th align="right">Qmm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">1981-01-01</td>
+<td align="right">7.08</td>
+<td align="right">-0.42</td>
+<td align="right">0.60</td>
+<td align="right">1.478965</td>
+</tr>
+<tr>
+<td align="left">1981-01-02</td>
+<td align="right">7.82</td>
+<td align="right">-2.55</td>
+<td align="right">0.32</td>
+<td align="right">1.359091</td>
+</tr>
+<tr>
+<td align="left">1981-01-03</td>
+<td align="right">27.37</td>
+<td align="right">2.43</td>
+<td align="right">0.98</td>
+<td align="right">2.937775</td>
+</tr>
+<tr>
+<td align="left">1981-01-04</td>
+<td align="right">22.56</td>
+<td align="right">-1.16</td>
+<td align="right">0.51</td>
+<td align="right">13.387093</td>
+</tr>
+<tr>
+<td align="left">1981-01-05</td>
+<td align="right">8.68</td>
+<td align="right">-4.86</td>
+<td align="right">0.02</td>
+<td align="right">5.047127</td>
+</tr>
+<tr>
+<td align="left">1981-01-06</td>
+<td align="right">14.99</td>
+<td align="right">-4.00</td>
+<td align="right">0.13</td>
+<td align="right">3.218356</td>
+</tr>
+</tbody>
+</table>
+<p>For the basin information <code>minimum_basin_info</code> one needs a
+list with …</p>
+<p>2303, Thur at Jonschwil, Mühlau, 493</p>
 </div>
-<div id="loop-over-all-settings" class="section level2">
-<h2>loop over all settings</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="fu">seq_along</span>(cal_fn_list)){</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_along</span>(model_list)){</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="cf">for</span> (m <span class="cf">in</span> <span class="fu">seq_along</span>(error_crit_transfo_list)) {</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>      error_crit_transfo <span class="ot">&lt;-</span> error_crit_transfo_list[m]</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>      model <span class="ot">&lt;-</span> model_list[k]</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>      cal_fn <span class="ot">&lt;-</span> cal_fn_list[j]</span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>      </span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>      <span class="co"># set snow_module to NULL</span></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>      <span class="cf">if</span> (cal_par[[model]][[<span class="st">&quot;has_snow_module&quot;</span>]]) snow_module <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>      <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">&quot;%s &gt; Start with %s: %s for model %s with snow module %s with target %s ...</span><span class="sc">\n</span><span class="st">&quot;</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>                  <span class="fu">Sys.time</span>(), HSU_ID, cal_fn, model, snow_module, error_crit_transfo))</span>
-<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>      </span>
-<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>      <span class="fu">suppressWarnings</span>(<span class="fu">suppressMessages</span>(<span class="fu">calibrate_validate</span>(model, input_data, basin_data, HSU_ID,</span>
-<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>                                          error_crit_transfo, cal_maximize, cal_fn,</span>
-<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>                                          do_transfo_param, cal_par,</span>
-<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>                                          val_crit_transfo, val_subseason)))</span>
-<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>    }</span>
-<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>  }</span>
-<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a>}</span></code></pre></div>
+<div id="choose-a-hydrological-model" class="section level3">
+<h3>Choose a hydrological model</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cal_par <span class="ot">&lt;-</span> default_cal_par <span class="co"># todo: this needs to be changed</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="st">&quot;TUW&quot;</span></span></code></pre></div>
+</div>
+<div id="create-input" class="section level3">
+<h3>Create input</h3>
+<p>This is done specifically for each model/package requirement, here <a href="https://rdrr.io/cran/TUWmodel/man/TUWmodel.html">TUWmodel</a>.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># todo: check on basin_info</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>input <span class="ot">&lt;-</span> <span class="fu">create_input</span>(model, minimum_input, <span class="fu">list</span>())</span></code></pre></div>
+</div>
+</div>
+<div id="new" class="section level2">
+<h2>New</h2>
+<div id="split-data-set-for-warm-up-calibration-and-validation" class="section level3">
+<h3>split data set for warm-up, calibration and validation</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>  <span class="co"># split data set</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  split_indices <span class="ot">&lt;-</span> <span class="fu">split_data_set</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>    minimum_input,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>    <span class="fu">c</span>(<span class="st">&quot;1981-01-01&quot;</span>, <span class="st">&quot;1982-12-31&quot;</span>, <span class="co"># warm up</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>      <span class="st">&quot;1983-01-01&quot;</span>, <span class="st">&quot;2000-12-31&quot;</span>, <span class="co"># calibration</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>      <span class="st">&quot;2001-01-01&quot;</span>, <span class="st">&quot;2020-12-31&quot;</span>) <span class="co"># validation</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  )</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  </span></code></pre></div>
+</div>
+<div id="calibration-settings" class="section level3">
+<h3>Calibration settings</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>cal_fn <span class="ot">=</span> <span class="st">&quot;steepest_descent&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>error_crit_transfo <span class="ot">&lt;-</span> <span class="st">&quot;KGE__none&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>cal_maximize <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>do_transfo_param <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span></code></pre></div>
+</div>
+<div id="put-basin-information-in-a-list" class="section level3">
+<h3>put basin information in a list</h3>
+<p>todo: some redundancy with input, needs to be solved in future
+releases</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>hydro_data <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>hydro_data<span class="sc">$</span>BasinObs <span class="ot">&lt;-</span> minimum_input</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>hydro_data<span class="sc">$</span>BasinInfo <span class="ot">&lt;-</span> minimum_basin_info</span></code></pre></div>
+</div>
+<div id="calibrate-the-model" class="section level3">
+<h3>Calibrate the model</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="co"># calibrate the model</span></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>calibration_results <span class="ot">&lt;-</span> <span class="fu">calibrate_model</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  hydro_data, split_indices, model, input,</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">cal_fn =</span> cal_fn, <span class="at">do_transfo_param =</span> do_transfo_param</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">suppressWarnings</span>() <span class="sc">%&gt;%</span> <span class="fu">suppressMessages</span>()</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; Random sampling with method steepest_descent finished in 1.663 secs with best value -1e+10...</span></span></code></pre></div>
+</div>
+<div id="show-calibration-results" class="section level3">
+<h3>show calibration results</h3>
+<p>Calibration finished in 3.375 sec with best criterion 10^{10} with
+the model parameters:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">print</span>(calibration_results<span class="sc">$</span>model_param)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt;  [1]   1.3994924   3.6323140   1.3347593  -2.5202757   1.2218662   0.9064595</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="co">#&gt;  [7] 422.0549947   6.1858522   1.5586710  15.2821514 206.0832909  72.1907824</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; [13]   0.1937425  23.3454285  19.5069737</span></span></code></pre></div>
+</div>
 </div>
 
 

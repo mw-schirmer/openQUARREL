@@ -5,8 +5,6 @@ check on topmodel delay
 works because of partial matching
 See if there is output on vilan for topmodel, as there are the old basin infos without these fields!!!
 
-explain calibration options
-
 create vignettes(1 minimalistic, snow modules, calibration_methods, putting all together)
 
 data from camels
@@ -28,5 +26,9 @@ Warnung: The vignette title specified in \VignetteIndexEntry{} is different from
 create_input could be integrated in simulate_model, but has some downsides maybe (simulating over many parameters)
 
 check redundancy at input airgr
+
+basin_info in first vignette, include/delete and check what is needed for topmodel
+
+explain runoff transformations
 
 
