@@ -571,6 +571,7 @@ transfo_param <- function(param, direction, model, snow_module = NULL, add_snow_
 #' @param cal_fn A string specifying the calibration function or method to use.
 #'   Supported options include \code{"DEoptim"}, \code{"hydroPSO"}, and \code{"malschains"}.
 #'   Monte Carlo variants can be specified using the format \code{"method__sampling__nruns"}.
+#'   For a complete list see table in `vignette("calibration_methods_overview")`.
 #' @param hydro_data A list or data frame containing observed runoff data, typically
 #'   loaded using \code{\link{load_meteo_data}}.
 #' @param split_indices A list of index vectors (e.g., from \code{\link{split_data_set}})
@@ -1524,6 +1525,7 @@ optim_fn <- function(ParamOptim, hydro_data, split_indices, model, input,
 #' @param cal_fn A string specifying the calibration function. Supported options include
 #'   \code{"Calibration_Michel"} (for \pkg{airGR} models), \code{"DEoptim"}, \code{"hydroPSO"},
 #'   \code{"malschains"}, and other supported optimizers.
+#'   For a complete list see table in `vignette("calibration_methods_overview")`.
 #' @param do_transfo_param Logical. If \code{TRUE}, parameters are transformed to a unit hypercube
 #'   before calibration.
 #' @param cal_par A list of calibration settings specific to the chosen calibration function.

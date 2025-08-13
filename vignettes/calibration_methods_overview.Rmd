@@ -1,0 +1,67 @@
+---
+title: "Calibration methods overview"
+author: "Michael Schirmer"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Calibration methods overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+The first column represents the `cal_fn` input string used in many functions.
+
+```{r, echo=FALSE}
+
+knitr::kable(
+  tibble::tibble(
+    "Calibration option" = c("Calibration_Michel", "steepest_descent", 
+                             "montecarlo__random__1000", "montecarlo__lhs__1000",  "montecarlo__sobol__1000",
+                             "nlminb", "optim", "nlminb__random__100", "optim__random__100",
+                             "DEoptim", "hydroPSO", "malschains"
+    ),
+    Description = c("Combination of a grid search with prior knowledge of parameter combination and a steepest descent local search",
+                    "Variant of Calibration_Michel with a monte carlo sampling with 100 trials instead of a grid search",
+                    "Monte carlo sampling with X trials (X is a variable, here 1000)",
+                    "Monte carlo sampling using a latin hyper cube",
+                    "Monte carlo sampling using sobol sampling",
+                    "Optimization using PORT routines",
+                    "General-purpose Optimization",
+                    "Optimization using PORT routines starting with Monte carlo resampling",
+                    "General-purpose Optimization starting with Monte carlo resampling",
+                    "Evolutionary global optimization via the Differential Evolution algorithm",
+                    "Enhanced Particle Swarm Optimisation",
+                    "Optimization with the MA-LS-Chains algorithm"
+    ),
+    Reference = c("[Calibration_Michel](https://rdrr.io/cran/airGR/man/Calibration_Michel.html)",
+                  "",
+                  "[runif](https://rdrr.io/r/stats/Uniform.html)",
+                  "[randomLHS](https://rdrr.io/cran/lhs/man/randomLHS.html)",
+                  "[sobol](https://rdrr.io/cran/randtoolbox/man/quasiRNG.html)",
+                  "[nlminb](https://rdrr.io/r/stats/nlminb.html)",
+                  "[optim](https://rdrr.io/r/stats/optim.html)",
+                  "[nlminb](https://rdrr.io/r/stats/nlminb.html)",
+                  "[optim](https://rdrr.io/r/stats/optim.html)",
+                  "[DEoptim](https://rdrr.io/cran/DEoptim/man/DEoptim.html)",
+                  "[hydroPSO](https://rdrr.io/cran/hydroPSO/man/hydroPSO.html)", 
+                  "[malschains](https://rdrr.io/cran/Rmalschains/man/malschains.html)"
+                  
+    ),
+    Package = c("[airGR](https://hydrogr.github.io/airGR/index.html)", "openQUARREL",
+                "stats", "[lhs](https://rdrr.io/cran/lhs)", "[randtoolbox](https://rdrr.io/cran/randtoolbox)",
+                rep("stats", 4),
+                "[DEoptim](https://rdrr.io/cran/DEoptim.html)", 
+                "[hydroPSO](https://rdrr.io/cran/hydroPSO.html)", 
+                "[Rmalschains](https://rdrr.io/cran/Rmalschains.html)"
+    ),
+  )
+)  
+
+```

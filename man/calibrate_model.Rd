@@ -46,7 +46,8 @@ can be included for transformations like Box-Cox.}
 
 \item{cal_fn}{A string specifying the calibration function. Supported options include
 \code{"Calibration_Michel"} (for \pkg{airGR} models), \code{"DEoptim"}, \code{"hydroPSO"},
-\code{"malschains"}, and other supported optimizers.}
+\code{"malschains"}, and other supported optimizers.
+For a complete list see table in \code{vignette("calibration_methods_overview")}.}
 
 \item{do_transfo_param}{Logical. If \code{TRUE}, parameters are transformed to a unit hypercube
 before calibration.}

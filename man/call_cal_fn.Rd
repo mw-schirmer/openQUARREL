@@ -24,7 +24,8 @@ call_cal_fn(
 \arguments{
 \item{cal_fn}{A string specifying the calibration function or method to use.
 Supported options include \code{"DEoptim"}, \code{"hydroPSO"}, and \code{"malschains"}.
-Monte Carlo variants can be specified using the format \code{"method__sampling__nruns"}.}
+Monte Carlo variants can be specified using the format \code{"method__sampling__nruns"}.
+For a complete list see table in \code{vignette("calibration_methods_overview")}.}
 
 \item{hydro_data}{A list or data frame containing observed runoff data, typically
 loaded using \code{\link{load_meteo_data}}.}

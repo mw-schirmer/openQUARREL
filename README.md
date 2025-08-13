@@ -21,7 +21,7 @@ several calibration routines and offers evaluation tool.
 It heavily relies on external packages as the
 [airGR](https://hydrogr.github.io/airGR/index.html),
 [hydromad](https://hydromad.github.io/index.html),
-[TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html) and
+[TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html) (HBV) and
 [topmodel](https://github.com/ICHydro/topmodel) with their hydrological
 models. Similarly, for calibration external packages are integrated as
 [DEoptim](https://cran.r-project.org/web/packages/DEoptim/index.html),

@@ -8,5 +8,6 @@ articles:
   - run_model_minimalistic
   - model_overview
   - include_snow_module
+  - calibration_methods_overview
   - calibrate_validate
 
