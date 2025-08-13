@@ -60,9 +60,9 @@ like so:
 install.packages("https://cran.r-project.org/src/contrib/Archive/topmodel/topmodel_0.7.5.tar.gz", repos = NULL, type = "source")
 ```
 
-Now you can install openQUARREL. Choose “3: None” after the prompt to
-not update your packages after this command as this will also update
-airGR (on CRAN) and hydromad (on github).
+Now you can install openQUARREL. \[!NOTE\] Choose “3: None” after the
+prompt to not update your packages after this command as this will also
+update airGR (on CRAN) and hydromad (on github).
 
 ``` r
 remotes::install_github("mw-schirmer/openQUARREL", dependencies = TRUE)
