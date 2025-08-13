@@ -33,8 +33,10 @@ optimizers (e.g., DEoptim, hydroPSO, malschains)."><meta property="og:image" con
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/run_model_minimalistic.html">Run a hydrological model (minimalistic example)</a>
+    <a class="dropdown-item" href="../articles/model_overview.html">Model overview</a>
     <a class="dropdown-item" href="../articles/include_snow_module.html">Couple a snow module to a hydrological model</a>
-    <a class="dropdown-item" href="../articles/calibrate_validate.html">Calibrate and validate hydrological models</a>
+    <a class="dropdown-item" href="../articles/calibration_methods_overview.html">Calibration methods overview</a>
+    <a class="dropdown-item" href="../articles/calibrate_validate.html">Calibration and validation</a>
   </div>
 </li>
       </ul><form class="form-inline my-2 my-lg-0" role="search">
@@ -91,7 +93,8 @@ indicating warm-up and calibration periods.</p></dd>
 
 
 <dt>model</dt>
-<dd><p>A string specifying the hydrological model to calibrate.</p></dd>
+<dd><p>A string specifying the hydrological model to calibrate.
+For a complete list see table in <code><a href="../articles/model_overview.html">vignette("model_overview")</a></code>.</p></dd>
 
 
 <dt>input</dt>
@@ -99,7 +102,7 @@ indicating warm-up and calibration periods.</p></dd>
 
 
 <dt>snow_module</dt>
-<dd><p>Optional. A string specifying the snow module (e.g., <code>"CemaNeige"</code>).</p></dd>
+<dd><p>Optional. A string specifying the snow module (currently <code>"CemaNeige"</code> and <code>"TUWsnow"</code>).</p></dd>
 
 
 <dt>snow_input</dt>
@@ -124,7 +127,8 @@ can be included for transformations like Box-Cox.</p></dd>
 <dt>cal_fn</dt>
 <dd><p>A string specifying the calibration function. Supported options include
 <code>"Calibration_Michel"</code> (for <span class="pkg">airGR</span> models), <code>"DEoptim"</code>, <code>"hydroPSO"</code>,
-<code>"malschains"</code>, and other supported optimizers.</p></dd>
+<code>"malschains"</code>, and other supported optimizers.
+For a complete list see table in <code><a href="../articles/calibration_methods_overview.html">vignette("calibration_methods_overview")</a></code>.</p></dd>
 
 
 <dt>do_transfo_param</dt>

@@ -3,9 +3,11 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   calibrate_validate: calibrate_validate.html
+  calibration_methods_overview: calibration_methods_overview.html
   include_snow_module: include_snow_module.html
+  model_overview: model_overview.html
   run_model_minimalistic: run_model_minimalistic.html
-last_built: 2025-08-13T08:46Z
+last_built: 2025-08-13T16:10Z
 urls:
   reference: https://mw-schirmer.github.io/openQUARREL/reference
   article: https://mw-schirmer.github.io/openQUARREL/articles

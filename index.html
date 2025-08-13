@@ -49,8 +49,10 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="articles/run_model_minimalistic.html">Run a hydrological model (minimalistic example)</a>
+    <a class="dropdown-item" href="articles/model_overview.html">Model overview</a>
     <a class="dropdown-item" href="articles/include_snow_module.html">Couple a snow module to a hydrological model</a>
-    <a class="dropdown-item" href="articles/calibrate_validate.html">Calibrate and validate hydrological models</a>
+    <a class="dropdown-item" href="articles/calibration_methods_overview.html">Calibration methods overview</a>
+    <a class="dropdown-item" href="articles/calibrate_validate.html">Calibration and validation</a>
   </div>
 </li>
       </ul>
@@ -74,7 +76,7 @@
 <!-- badges: end -->
 <p>A Meta-Package Integrating Several Hydrological Model Packages in R.</p>
 <p>An R meta-package of lumped conceptual models was developed based on the review of R-packages and the therein stated aim “[…] to run all the packages through the same R architecture” <a href="https://doi.org/10.5194/hess-25-3937-2021" class="external-link">(Astagneau et al., 2021)</a>. So far the models are restricted to daily input. It was called openQUARREL (QUantifying And Reducing uncertainties with an R package providing an Ensemble of hydrological modeLs) and combines hydrological model packages, applies several calibration routines and offers evaluation tool.</p>
-<p>It heavily relies on external packages as the <a href="https://hydrogr.github.io/airGR/index.html" class="external-link">airGR</a>, <a href="https://hydromad.github.io/index.html" class="external-link">hydromad</a>, <a href="https://rdrr.io/cran/TUWmodel/man/TUWmodel.html" class="external-link">TUWmodel</a> and <a href="https://github.com/ICHydro/topmodel" class="external-link">topmodel</a> with their hydrological models. Similarly, for calibration external packages are integrated as <a href="https://cran.r-project.org/web/packages/DEoptim/index.html" class="external-link">DEoptim</a>, <a href="https://github.com/hzambran/hydroPSO" class="external-link">hydroPSO</a> and others. For objective functions it uses the <a href="https://cran.r-project.org/web/packages/hydroGOF/index.html" class="external-link">hydroGOF</a> package, and applies the great plots of <a href="https://hydrogr.github.io/airGR/index.html" class="external-link">airGR</a> to models of other packages.</p>
+<p>It heavily relies on external packages as the <a href="https://hydrogr.github.io/airGR/index.html" class="external-link">airGR</a>, <a href="https://hydromad.github.io/index.html" class="external-link">hydromad</a>, <a href="https://rdrr.io/cran/TUWmodel/man/TUWmodel.html" class="external-link">TUWmodel</a> (HBV) and <a href="https://github.com/ICHydro/topmodel" class="external-link">topmodel</a> with their hydrological models. Similarly, for calibration external packages are integrated as <a href="https://cran.r-project.org/web/packages/DEoptim/index.html" class="external-link">DEoptim</a>, <a href="https://github.com/hzambran/hydroPSO" class="external-link">hydroPSO</a> and others. For objective functions it uses the <a href="https://cran.r-project.org/web/packages/hydroGOF/index.html" class="external-link">hydroGOF</a> package, and applies the great plots of <a href="https://hydrogr.github.io/airGR/index.html" class="external-link">airGR</a> to models of other packages.</p>
 <p><img src="reference/figures/openQUARREL_overview.png"></p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
