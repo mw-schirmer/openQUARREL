@@ -32,13 +32,18 @@ source("run_model_minimalistic.R")
 ```
 
 
-We need now additionally the hydroGOF package and observed streamflow (column Qmm).
+We now need additionally the hydroGOF package.
 
 **Note:** the warning of deprecated packages can be ignored, openQUARREL is using only
 non-affected parts of hydroGOF.
 ```{r packages_new}
 library(hydroGOF)
+```
 
+
+... and observed streamflow (column Qmm) from the example data set.
+
+```{r Qobs}
 minimum_input <- input_data %>% 
   filter(HSU_ID == "2303") %>% 
   select(DatesR, Qmm) %>%
@@ -49,13 +54,13 @@ minimum_input <- input_data %>%
 Define periods for warm-up, calibration and validation:
 
 ``` {r split indices}
-  # split data set
-  split_indices <- split_data_set(
-    minimum_input,
-    c("1981-01-01", "1982-12-31", # warm up
-      "1983-01-01", "2000-12-31", # calibration
-      "2001-01-01", "2020-12-31") # validation
-  )
+# split data set
+split_indices <- split_data_set(
+  minimum_input,
+  c("1981-01-01", "1982-12-31", # warm up
+    "1983-01-01", "2000-12-31", # calibration
+    "2001-01-01", "2020-12-31") # validation
+)
 ```
 
 
@@ -90,7 +95,6 @@ hydro_data$BasinInfo <- minimum_basin_info
 Calibrate the model.
 
 ```{r calibrate}
-
 # calibrate the model
 calibration_results <- calibrate_model(
   hydro_data, split_indices, model, input,
@@ -104,7 +108,7 @@ Show calibration results:
 Calibration finished in `r calibration_results$duration %>% as.numeric()` sec with best criterion `r calibration_results$error_crit_val` with the model parameters:
 
 
-```{r calibration_results, eval=FALSE}
+```{r calibration_results}
 # get the parameter names and print
 names(calibration_results$model_param) <- default_cal_par[[model]]$lower
 print(calibration_results$model_param)
@@ -118,7 +122,7 @@ storing also under the entry `more_info` output of the chosen calibration functi
 str(calibration_results)
 ```
 
-Simulate model, similar to `vignette("include_snow_module")`, but taking now using calibrated parameters.
+Simulate model, similar to `vignette("include_snow_module")`, but now applying the calibrated parameters.
 
 ```{r simulate_model}
 # simulate snow, if an external snow module is needed (not here, but when you change it)
@@ -144,15 +148,18 @@ if (exists("snow_module")) {
 # Note: we put Qobs as input to have it available for airGR plots
 sim <- simulate_model(model, calibration_results$model_param, input, Qobs = hydro_data$BasinObs$Qmm)
 
-if (exists("snow_module_results"))
-sim <- merge_snow_runoff_sim(sim, snow_module_results)
+# merge snow module results with hydro model results
+if (exists("snow_module_results")) {
+  sim <- merge_snow_runoff_sim(sim, snow_module_results) 
+}
+
 ```
 
 ## Validation
 
 ### Plots
 
-For validation there are two plots availalbe which can be right now only only saved to disc as pdf 
+For validation there are two plots available which can be right now only only saved to disc as pdf 
 (which will be changed in a future release).
 
 The first is a simple plot showing simulated and observed streamflow with some indicators for both 
@@ -189,16 +196,18 @@ Here is the validation plot shown:
 
 ![](figures/airGR_val.png)
 
+It seems that this model has difficulties in spring with snow melt, quite probably because of a missing snow covered fraction parameterisation. Try this with the model `CemaNeigeGR4J` as this snow module has such a parameterisation implemented.
 
 ### Calculation of (sub)seasonal performance metrics
 
 Define metrics with streamflow transformations, separated by `__`. 
-For example `mae__power__-0.5` is the mean absolute error calculated with the 
+For example `mae__power__-0.5` is the mean absolute error calculated with 
 [hydroGOF::mae](https://rdrr.io/cran/hydroGOF/man/mae.html), and using a power 
-transformation with exponent 0.2.
+transformation with exponent -0.5.
+
+**Note:** All these (and other) string combinations can also be used for calibration with applying it to `error_crit_transfo`. 
 
 ``` {r def_val_crit} 
-
 # validation settings
 val_crit_transfo <- c("KGE__none", "NSE__none", "VE__none", "pbias__none", "mae__none", "mse__none",
                       "KGE__power__0.2",  "NSE__power__0.2", "mae__power__0.2", "mse__power__0.2",
@@ -210,7 +219,6 @@ val_crit_transfo <- c("KGE__none", "NSE__none", "VE__none", "pbias__none", "mae_
 Define the subseasons for which the above defined metrics are calculated for:
 
 ``` {r val_subseason}
-
 # a list with names and arrays of two digits describing months used to calculate
 # subseasonal validation metrics
 val_subseason <- list(spring = c("02", "03", "04", "05"), 
@@ -220,8 +228,6 @@ val_subseason <- list(spring = c("02", "03", "04", "05"),
 Calculate (sub)seasonal metrics. It will automatically calculate performance metrics for the whole year (all).
 
 ``` {r calc_perf}
-
-
 # calculate performance metrics for calibration period
 perf_cal <- calc_subseasonal_validation_results(val_subseason, hydro_data$BasinObs$DatesR,
                                                 split_indices$ind_cal, "calibration",
@@ -240,15 +246,14 @@ perf_val <- calc_subseasonal_validation_results(val_subseason, hydro_data$BasinO
 perf_df <- dplyr::bind_rows(perf_cal, perf_val)
 ```
 
-Show the results which is a tibble:
+Show the results which is a tibble. Lambda is the exponent if a power transformation is used ...
 ```{r show_table}
 knitr::kable(head(perf_df))
 ```
 
-This result can be stored as ascii file
+This result can be stored as ascii file:
 
 ``` {r save_ascii, eval=FALSE}
-
 # write ascii results overview
 write_ascii(
   file.path(output_folder, "perf_ascii.txt"),
@@ -261,7 +266,6 @@ write_ascii(
 All results can be stored as a binary
 
 ``` {r save_binary, eval=FALSE}
-
 # for this split sim in calibration and validation periods
 sim_list <- list()
 sim_list$cal <- subset_simulations(split_indices$ind_cal, sim)
@@ -281,6 +285,6 @@ saveRDS(
 
 ## Next steps
 Choose a different model, or a snow module/hydrological model combination,
-a different calibration function and streamflow transformation for calibration 
-(e.g. `error_crit_transfo <- "NSE__power__0.2"`) or do it in a different subbasin, 
+or a different calibration function (see `vignette("calibration_methods_overview")` for a complete list), or a different streamflow transformation for calibration 
+(e.g. `error_crit_transfo <- "NSE__power__0.2"`) or do it in a different subbasin 
 with filtering the example data to a different HSU_ID.
