@@ -1980,7 +1980,7 @@ simulate_model <- function(model, model_param, input, ind = seq_along(input[[1]]
         max_length <- max(purrr::map_int(data_list, length))
         # looping over all list entries (i.e. vectors and fill NA at the end)
         df <- data_list %>%
-          map_if(~ length(.x) < max_length, ~ c(.x, rep(NA, max_length - length(.x)))) %>%
+          purrr::map_if(~ length(.x) < max_length, ~ c(.x, rep(NA, max_length - length(.x)))) %>%
           bind_cols()
       }
 
