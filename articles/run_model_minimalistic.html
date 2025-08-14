@@ -88,32 +88,19 @@ example.</p>
 <div class="section level2">
 <h2 id="preparations">Preparations<a class="anchor" aria-label="anchor" href="#preparations"></a>
 </h2>
-<div class="section level3">
-<h3 id="load-packages">Load packages<a class="anchor" aria-label="anchor" href="#load-packages"></a>
-</h3>
+<p>Load packages</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mw-schirmer.github.io/openQUARREL/">openQUARREL</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="load-data">Load data<a class="anchor" aria-label="anchor" href="#load-data"></a>
-</h3>
+<p>Load data</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">input_data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">basin_data</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="create-a-minimum-input">Create a minimum input<a class="anchor" aria-label="anchor" href="#create-a-minimum-input"></a>
-</h3>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">input_data</span><span class="op">)</span></span></code></pre></div>
+<p>Create a minimum input</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># can be done as separate data set</span></span>
 <span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">HSU_ID</span> <span class="op">==</span> <span class="st">"2303"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">DatesR</span>, <span class="va">P</span>, <span class="cn">T</span>, <span class="va">E</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">minimum_basin_info</span> <span class="op">&lt;-</span> <span class="va">basin_data</span><span class="op">[[</span><span class="st">"2303"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co"># todo: delete HypsoData in general</span></span>
-<span><span class="va">minimum_basin_info</span><span class="op">$</span><span class="va">HypsoData</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span></span>
 <span><span class="co"># convert Date to POSIXct</span></span>
 <span><span class="co"># todo: put it into input_data already, but is also good to show it here</span></span>
@@ -171,17 +158,11 @@ there are functions available, e.g. in <a href="https://rdrr.io/cran/airGR/man/
 </tr>
 </tbody>
 </table>
-<p>For the basin information <code>minimum_basin_info</code> one needs a
-list with …</p>
-<p>2303, Thur at Jonschwil, Mühlau, 493</p>
-</div>
-<div class="section level3">
-<h3 id="choose-a-hydrological-model">Choose a hydrological model<a class="anchor" aria-label="anchor" href="#choose-a-hydrological-model"></a>
-</h3>
+<p>Choose a hydrological model</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cal_par</span> <span class="op">&lt;-</span> <span class="va">default_cal_par</span> <span class="co"># todo: this needs to be changed</span></span>
+<span><span class="co"># todo: topmodel is not running right now as the BasinInfo is not provided in example data</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"TUW"</span></span></code></pre></div>
-</div>
 <div class="section level3">
 <h3 id="set-model-parameters">Set model parameters<a class="anchor" aria-label="anchor" href="#set-model-parameters"></a>
 </h3>
