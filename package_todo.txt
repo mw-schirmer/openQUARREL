@@ -27,7 +27,7 @@ create_input could be integrated in simulate_model, but has some downsides maybe
 
 check redundancy at input airgr
 
-basin_info in first vignette, include/delete and check what is needed for topmodel
+basin_info with topmodel information
 
 explain runoff transformations
 

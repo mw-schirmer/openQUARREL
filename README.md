@@ -16,9 +16,9 @@ packages through the same R architecture” [(Astagneau et al.,
 restricted to daily input. It was called openQUARREL (QUantifying And
 Reducing uncertainties with an R package providing an Ensemble of
 hydrological modeLs) and combines hydrological model packages, applies
-several calibration routines and offers evaluation tool.
+several calibration routines and offers evaluation tools.
 
-It heavily relies on external packages as the
+It heavily relies on external packages as
 [airGR](https://hydrogr.github.io/airGR/index.html),
 [hydromad](https://hydromad.github.io/index.html),
 [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html) (HBV) and
@@ -33,6 +33,11 @@ package, and applies the great plots of
 packages.
 
 ![](man/figures/openQUARREL_overview.png)
+
+The multimodel is operationally in use for monthly drought forecasting
+since September 2023. Current results are available under
+<https://www.drought.ch/de/prognosen/hydrologisches-multimodell/>
+(description in German only).
 
 ## Installation
 
@@ -55,9 +60,11 @@ like so:
 install.packages("https://cran.r-project.org/src/contrib/Archive/topmodel/topmodel_0.7.5.tar.gz", repos = NULL, type = "source")
 ```
 
-Now you can install openQUARREL. **Note:** Choose “3: None” after the
-prompt to not update your packages after this command as this will also
-update airGR (on CRAN) and hydromad (on github).
+Now you can install openQUARREL.
+
+**Note:** Choose “3: None” after the prompt to not update your packages
+after this command as this will also update airGR (on CRAN) and hydromad
+(on github).
 
 ``` r
 remotes::install_github("mw-schirmer/openQUARREL", dependencies = TRUE)
@@ -67,6 +74,11 @@ remotes::install_github("mw-schirmer/openQUARREL", dependencies = TRUE)
 
 This is a basic example which shows you how to run some hydrological
 models `vignette("run_model_minimalistic")`.
+
+## Code availability
+
+The code is available to download under
+<https://github.com/mw-schirmer/openQUARREL>.
 
 ## Your contribution
 

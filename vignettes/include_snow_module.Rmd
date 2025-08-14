@@ -17,9 +17,9 @@ knitr::opts_chunk$set(
 This vignette shows how to couple a hydrological model with a hydrological model without a snow model.
 While `snow`, `TUW` and the `airGR` models come with an own snow module (the latter just with renaming the model from `GR6J` to `CemaNeigeGR6J`), this needs a bit more coding within this package (and can be done more integrated similar to the [airGR](https://rdrr.io/cran/airGR/) package in the future). Important new parts are in *italic*.
 
-## Preparations
+### Preparations
 
-### Load packages
+Load packages
 
 ```{r packages, include=FALSE}
 library(openQUARREL)
@@ -31,22 +31,18 @@ library(openQUARREL)
 library(dplyr)
 ```
 
-### Load data
+Load data
 ```{r load data}
 data(input_data)
 data(basin_data)
 ```
 
-### Create a minimum input
+Create a minimum input
 ```{r minimum data}
 # can be done as separate data set
 minimum_input <- input_data %>% 
   filter(HSU_ID == "2303") %>% 
   select(DatesR, P, T, E)
-
-minimum_basin_info <- basin_data[["2303"]]
-# todo: delete HypsoData in general
-minimum_basin_info$HypsoData <- NULL
 
 # convert Date to POSIXct
 # todo: put it into input_data already, but is also good to show it here
@@ -54,44 +50,48 @@ minimum_input$DatesR <- as.POSIXct(minimum_input$DatesR)
 attr(minimum_input$DatesR, "tzone") <- "UTC"
 ```
 
-### *Choose a snow module and a hydrological model (without an own snow module)*
+New parts are in italic:
+
+*Choose a snow module and a hydrological model (without an own snow module)*
 ```{r settings}
 cal_par <- default_cal_par # todo: this needs to be changed
 snow_module <- "CemaNeige"
+# todo: topmodel is not running right now as the BasinInfo is not provided in example data
 model <- "sacramento"
 ```
 
-### Set model parameters
+Set model parameters
 ```{r param}
 param <- (default_cal_par[[model]]$upper + default_cal_par[[model]]$lower) / 2
 print(param)
 ```
-### *Set snow module parameters*
+
+*Set snow module parameters*
 ```{r snow param}
 snow_param <- (default_cal_par[[snow_module]]$upper + default_cal_par[[snow_module]]$lower) / 2
 print(snow_param)
 ```
 
-### Create input 
+Create input 
 ```{r input}
 # todo: check on basin_info
 input <- create_input(model, minimum_input, list()) %>% 
   suppressWarnings() %>% suppressMessages()
 ```
 
-### *Create snow input*
+*Create snow input*
 ```{r snow input}
 snow_input <- create_input(snow_module, minimum_input, list()) %>% 
   suppressWarnings() %>% suppressMessages()
 ```
 
-## Run the model without the snow module
+Run the model without the snow module
 ```{r run model}
 sim <- simulate_model(model, param, input)
 ```
 
-## *Run the model with the snow module*
-### *Simulate snow module*
+### *Run the model with the snow module*
+*Simulate snow module*
 ```{r simulate snow}
 # simulate snow module
 snow_module_results <- simulate_snow(snow_module, snow_param, snow_input) %>% 
@@ -103,7 +103,7 @@ Update precipitation with snow module surface water runoff
 input$P <- snow_module_results$surface_water_runoff
 ```
 
-### *Run the model with updated input*
+Run the model with updated input*
 ```{r run_ snow module}
 sim_update <- simulate_model(model, param, input)
 ```
@@ -119,7 +119,7 @@ The output contains now also the snow module results `SWE`, `psolid`, `pliquid` 
 str(sim_update)
 ```
 
-## Plot results
+### Plot results
 Here is a simple plot for simulated discharge with (red) and without (black) the snow module, skipping the first ~3 years (warm-up):
 ```{r plot}
 plot(sim$date[3*365:length(sim$date)], sim$Qsim[3*365:length(sim$date)], type = "l", main = "Simulated Discharge", ylab = "Q [mm/d]", xlab = "Date")
@@ -127,6 +127,6 @@ lines(sim_update$date[3*365:length(sim$date)], sim_update$Qsim[3*365:length(sim$
 
 ```
 
-## Next steps
+### Next steps
 Now you do this again with a different hydrological model or snow module (see table in `vignette("model_overview")`), or proceed with  `vignette("calibrate_validate")`. 
 

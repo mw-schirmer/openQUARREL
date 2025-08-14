@@ -19,7 +19,7 @@ This vignette shows how to run a hydrological model as a minimalistic example.
 
 ## Preparations
 
-### Load packages
+Load packages
 
 ```{r packages, include=FALSE}
 library(openQUARREL)
@@ -32,22 +32,17 @@ library(dplyr)
 ```
 
 
-### Load data
+Load data
 ```{r load data}
 data(input_data)
-data(basin_data)
 ```
 
-### Create a minimum input
+Create a minimum input
 ```{r minimum data}
 # can be done as separate data set
 minimum_input <- input_data %>% 
   filter(HSU_ID == "2303") %>% 
   select(DatesR, P, T, E)
-
-minimum_basin_info <- basin_data[["2303"]]
-# todo: delete HypsoData in general
-minimum_basin_info$HypsoData <- NULL
 
 # convert Date to POSIXct
 # todo: put it into input_data already, but is also good to show it here
@@ -61,24 +56,23 @@ The data frame `minimum_input` contains columns `P` for precipitation in mm/d, `
 knitr::kable(head(minimum_input))
 ```
 
-For the basin information `minimum_basin_info` one needs a list with ...
-
-`r minimum_basin_info`
-
-### Choose a hydrological model
+Choose a hydrological model
 ```{r settings}
 cal_par <- default_cal_par # todo: this needs to be changed
+# todo: topmodel is not running right now as the BasinInfo is not provided in example data
 model <- "TUW"
 ```
 
 ### Set model parameters
+
 Create a parameter set, which is here the middle points of the provided intervals. See [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html) documentation for parameter explanation. The list `default_cal_par` is loaded with `library(openQUARREL)` and holds model and calibration specific settings. 
 ```{r param}
 param <- (default_cal_par[[model]]$upper + default_cal_par[[model]]$lower) / 2
 print(param)
 ```
 
-### Create input 
+### Create input
+
 This is done specifically for each model/package requirement, here [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html).
 ```{r input}
 # todo: check on basin_info
