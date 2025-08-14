@@ -91,8 +91,7 @@ model</p>
 </h2>
 <p>Do <code><a href="../articles/run_model_minimalistic.html">vignette("run_model_minimalistic")</a></code> for data
 loading.</p>
-<p>We need now additionally the hydroGOF package and observed streamflow
-(column Qmm).</p>
+<p>We now need additionally the hydroGOF package.</p>
 <p><strong>Note:</strong> the warning of deprecated packages can be
 ignored, openQUARREL is using only non-affected parts of hydroGOF.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -115,21 +114,22 @@ ignored, openQUARREL is using only non-affected parts of hydroGOF.</p>
 <span><span class="co">#&gt; plan transition at your earliest convenience (see</span></span>
 <span><span class="co">#&gt; https://r-spatial.org/r/2023/05/15/evolution4.html and earlier blogs</span></span>
 <span><span class="co">#&gt; for guidance);some functionality will be moved to 'sp'.</span></span>
-<span><span class="co">#&gt;  Checking rgeos availability: FALSE</span></span>
-<span></span>
-<span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">HSU_ID</span> <span class="op">==</span> <span class="st">"2303"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">DatesR</span>, <span class="va">Qmm</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">minimum_input</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">DatesR</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Define periods for warm-up, calibration and validation:</p>
+<span><span class="co">#&gt;  Checking rgeos availability: FALSE</span></span></code></pre></div>
+<p>… and observed streamflow (column Qmm) from the example data set.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span>  <span class="co"># split data set</span></span>
-<span>  <span class="va">split_indices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/split_data_set.html">split_data_set</a></span><span class="op">(</span></span>
-<span>    <span class="va">minimum_input</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1981-01-01"</span>, <span class="st">"1982-12-31"</span>, <span class="co"># warm up</span></span>
-<span>      <span class="st">"1983-01-01"</span>, <span class="st">"2000-12-31"</span>, <span class="co"># calibration</span></span>
-<span>      <span class="st">"2001-01-01"</span>, <span class="st">"2020-12-31"</span><span class="op">)</span> <span class="co"># validation</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">HSU_ID</span> <span class="op">==</span> <span class="st">"2303"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">DatesR</span>, <span class="va">Qmm</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">inner_join</span><span class="op">(</span><span class="va">minimum_input</span>, <span class="fu">join_by</span><span class="op">(</span><span class="va">DatesR</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Define periods for warm-up, calibration and validation:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># split data set</span></span>
+<span><span class="va">split_indices</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/split_data_set.html">split_data_set</a></span><span class="op">(</span></span>
+<span>  <span class="va">minimum_input</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"1981-01-01"</span>, <span class="st">"1982-12-31"</span>, <span class="co"># warm up</span></span>
+<span>    <span class="st">"1983-01-01"</span>, <span class="st">"2000-12-31"</span>, <span class="co"># calibration</span></span>
+<span>    <span class="st">"2001-01-01"</span>, <span class="st">"2020-12-31"</span><span class="op">)</span> <span class="co"># validation</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="calibration">Calibration<a class="anchor" aria-label="anchor" href="#calibration"></a>
@@ -138,14 +138,14 @@ ignored, openQUARREL is using only non-affected parts of hydroGOF.</p>
 transformation applied (here <code>KGE</code> and <code>none</code>
 separated by a <code>__</code>), and whether you want to transform
 parameters to a hypercube.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cal_fn</span> <span class="op">&lt;-</span> <span class="st">"steepest_descent"</span></span>
 <span></span>
 <span><span class="va">error_crit_transfo</span> <span class="op">&lt;-</span> <span class="st">"KGE__none"</span></span>
 <span><span class="va">do_transfo_param</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span></code></pre></div>
 <p>Put basin information in a list. (todo: some redundancy with input,
 needs to be solved in future releases)</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">hydro_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">hydro_data</span><span class="op">$</span><span class="va">BasinObs</span> <span class="op">&lt;-</span> <span class="va">minimum_input</span></span>
 <span></span>
@@ -155,38 +155,44 @@ needs to be solved in future releases)</p>
 <span><span class="va">minimum_basin_info</span><span class="op">$</span><span class="va">HypsoData</span> <span class="op">&lt;-</span> <span class="cn">NULL</span></span>
 <span><span class="va">hydro_data</span><span class="op">$</span><span class="va">BasinInfo</span> <span class="op">&lt;-</span> <span class="va">minimum_basin_info</span></span></code></pre></div>
 <p>Calibrate the model.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># calibrate the model</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># calibrate the model</span></span>
 <span><span class="va">calibration_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_model.html">calibrate_model</a></span><span class="op">(</span></span>
 <span>  <span class="va">hydro_data</span>, <span class="va">split_indices</span>, <span class="va">model</span>, <span class="va">input</span>,</span>
 <span>  cal_fn <span class="op">=</span> <span class="va">cal_fn</span>, do_transfo_param <span class="op">=</span> <span class="va">do_transfo_param</span></span>
-<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Random sampling with method steepest_descent finished in 1.152 secs with best value 0.78...</span></span></code></pre></div>
+<span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Random sampling with method steepest_descent finished in 1.23 secs with best value 0.76...</span></span></code></pre></div>
 <p>Show calibration results:</p>
-<p>Calibration finished in 24.647 sec with best criterion 0.819476 with
+<p>Calibration finished in 23.411 sec with best criterion 0.8195545 with
 the model parameters:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># get the parameter names and print</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">calibration_results</span><span class="op">$</span><span class="va">model_param</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">default_cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">lower</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">calibration_results</span><span class="op">$</span><span class="va">model_param</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">calibration_results</span><span class="op">$</span><span class="va">model_param</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         0.9           0           1          -3          -2           0 </span></span>
+<span><span class="co">#&gt;   1.4760000   0.7656667   1.4891904  -3.0000000  -1.3875418   1.0000000 </span></span>
+<span><span class="co">#&gt;           0           0           0           2          30           1 </span></span>
+<span><span class="co">#&gt; 136.6771282   7.7106524   1.8161368   7.6114875 188.4000000   6.9400000 </span></span>
+<span><span class="co">#&gt;           0           0           0 </span></span>
+<span><span class="co">#&gt;   0.0800000   5.9628979  20.1634165</span></span></code></pre></div>
 <p>There is more information after calibration,
 <code>calibration_results</code> is a list of storing also under the
 entry <code>more_info</code> output of the chosen calibration
 function.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">calibration_results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 12</span></span>
 <span><span class="co">#&gt;  $ model                 : chr "TUW"</span></span>
 <span><span class="co">#&gt;  $ snow_module           : NULL</span></span>
-<span><span class="co">#&gt;  $ model_param           : num [1:15] 1.469 0.613 1.324 -3 -1.842 ...</span></span>
+<span><span class="co">#&gt;  $ model_param           : Named num [1:15] 1.476 0.766 1.489 -3 -1.388 ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:15] "0.9" "0" "1" "-3" ...</span></span>
 <span><span class="co">#&gt;  $ preset_snow_parameters: logi FALSE</span></span>
 <span><span class="co">#&gt;  $ cal_fn                : chr "steepest_descent"</span></span>
 <span><span class="co">#&gt;  $ error_crit_transfo    : chr "KGE__none"</span></span>
-<span><span class="co">#&gt;  $ error_crit_val        : num 0.819</span></span>
+<span><span class="co">#&gt;  $ error_crit_val        : num 0.82</span></span>
 <span><span class="co">#&gt;  $ cal_maximize          : logi TRUE</span></span>
 <span><span class="co">#&gt;  $ do_transfo_param      : logi TRUE</span></span>
-<span><span class="co">#&gt;  $ duration              : 'difftime' num 24.647</span></span>
+<span><span class="co">#&gt;  $ duration              : 'difftime' num 23.411</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "units")= chr "secs"</span></span>
 <span><span class="co">#&gt;  $ cal_par               :List of 7</span></span>
 <span><span class="co">#&gt;   ..$ lower          : Named num [1:15] 0.9 0 1 -3 -2 0 0 0 0 2 ...</span></span>
@@ -208,33 +214,33 @@ function.</p>
 <span><span class="co">#&gt;   .. .. ..$ maxit     : num 50</span></span>
 <span><span class="co">#&gt;   .. .. ..$ reltol    : num 1e-10</span></span>
 <span><span class="co">#&gt;  $ more_info             :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ ParamFinalR  : num [1:15] 0.948 0.1225 0.1618 0 0.0396 ...</span></span>
-<span><span class="co">#&gt;   ..$ CritFinal    : num -0.819</span></span>
-<span><span class="co">#&gt;   ..$ NIter        : num 112</span></span>
-<span><span class="co">#&gt;   ..$ NRuns        : num 2947</span></span>
-<span><span class="co">#&gt;   ..$ HistParamR   : num [1:112, 1:15] 0.999 0.999 0.999 0.999 0.999 ...</span></span>
+<span><span class="co">#&gt;   ..$ ParamFinalR  : num [1:15] 0.96 0.153 0.245 0 0.153 ...</span></span>
+<span><span class="co">#&gt;   ..$ CritFinal    : num -0.82</span></span>
+<span><span class="co">#&gt;   ..$ NIter        : num 110</span></span>
+<span><span class="co">#&gt;   ..$ NRuns        : num 2820</span></span>
+<span><span class="co">#&gt;   ..$ HistParamR   : num [1:110, 1:15] 0.492 0.492 0.492 0.492 1 ...</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
 <span><span class="co">#&gt;   .. .. ..$ : NULL</span></span>
 <span><span class="co">#&gt;   .. .. ..$ : chr [1:15] "Param1" "Param2" "Param3" "Param4" ...</span></span>
-<span><span class="co">#&gt;   ..$ HistCrit     : num [1:112, 1] -0.779 -0.808 -0.811 -0.812 -0.814 ...</span></span>
+<span><span class="co">#&gt;   ..$ HistCrit     : num [1:110, 1] -0.756 -0.774 -0.787 -0.79 -0.796 ...</span></span>
 <span><span class="co">#&gt;   ..$ CritName     : chr "KGE_none"</span></span>
 <span><span class="co">#&gt;   ..$ CritBestValue: NULL</span></span></code></pre></div>
 <p>Simulate model, similar to
-<code><a href="../articles/include_snow_module.html">vignette("include_snow_module")</a></code>, but taking now using
+<code><a href="../articles/include_snow_module.html">vignette("include_snow_module")</a></code>, but now applying the
 calibrated parameters.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># simulate snow, if an external snow module is needed (not here, but when you change it)</span></span>
 <span><span class="co"># todo: this update process can be put in one function</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"snow_module"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">snow_module</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    </span>
 <span>    <span class="co"># create input</span></span>
-<span>    <span class="va">snow_input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_input.html">create_input</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">minimum_input</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">snow_input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_input.html">create_input</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">minimum_input</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>    </span>
 <span>    <span class="co"># simulate snow</span></span>
-<span>    <span class="va">snow_module_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_snow.html">simulate_snow</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">snow_param</span>, <span class="va">snow_input</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">snow_module_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_snow.html">simulate_snow</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">snow_param</span>, <span class="va">snow_input</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>    </span>
 <span>    <span class="co"># update precip</span></span>
 <span>    <span class="va">input</span><span class="op">$</span><span class="va">P</span> <span class="op">&lt;-</span> <span class="va">snow_module_results</span><span class="op">$</span><span class="va">surface_water_runoff</span></span>
@@ -246,8 +252,10 @@ calibrated parameters.</p>
 <span><span class="co"># Note: we put Qobs as input to have it available for airGR plots</span></span>
 <span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">calibration_results</span><span class="op">$</span><span class="va">model_param</span>, <span class="va">input</span>, Qobs <span class="op">=</span> <span class="va">hydro_data</span><span class="op">$</span><span class="va">BasinObs</span><span class="op">$</span><span class="va">Qmm</span><span class="op">)</span></span>
 <span></span>
-<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"snow_module_results"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_snow_runoff_sim.html">merge_snow_runoff_sim</a></span><span class="op">(</span><span class="va">sim</span>, <span class="va">snow_module_results</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># merge snow module results with hydro model results</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/exists.html" class="external-link">exists</a></span><span class="op">(</span><span class="st">"snow_module_results"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_snow_runoff_sim.html">merge_snow_runoff_sim</a></span><span class="op">(</span><span class="va">sim</span>, <span class="va">snow_module_results</span><span class="op">)</span> </span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="validation">Validation<a class="anchor" aria-label="anchor" href="#validation"></a>
@@ -255,7 +263,7 @@ calibrated parameters.</p>
 <div class="section level3">
 <h3 id="plots">Plots<a class="anchor" aria-label="anchor" href="#plots"></a>
 </h3>
-<p>For validation there are two plots availalbe which can be right now
+<p>For validation there are two plots available which can be right now
 only only saved to disc as pdf (which will be changed in a future
 release).</p>
 <p>The first is a simple plot showing simulated and observed streamflow
@@ -270,28 +278,34 @@ simulated streamflow is red.</p>
 <p>The second plot is the great <a href="https://rdrr.io/cran/airGR/man/plot.OutputsModel.html" class="external-link">airGR::plot</a>
 adapted to models from other packages. We plot it for the calibration
 and validation period separately.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># airGR plots for validation and calibration time period</span></span>
 <span></span>
 <span><span class="co"># calibration period</span></span>
-<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_cal.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_cal</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_cal.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_cal</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># validation period</span></span>
-<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_val.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_val</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_val.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_val</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Here is the validation plot shown:</p>
 <p><img src="figures/airGR_val.png"></p>
+<p>It seems that this model has difficulties in spring with snow melt,
+quite probably because of a missing snow covered fraction
+parameterisation. Try this with the model <code>CemaNeigeGR4J</code> as
+this snow module has such a parameterisation implemented.</p>
 </div>
 <div class="section level3">
 <h3 id="calculation-of-subseasonal-performance-metrics">Calculation of (sub)seasonal performance metrics<a class="anchor" aria-label="anchor" href="#calculation-of-subseasonal-performance-metrics"></a>
 </h3>
 <p>Define metrics with streamflow transformations, separated by
 <code>__</code>. For example <code>mae__power__-0.5</code> is the mean
-absolute error calculated with the <a href="https://rdrr.io/cran/hydroGOF/man/mae.html" class="external-link">hydroGOF::mae</a>, and
-using a power transformation with exponent 0.2.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># validation settings</span></span>
+absolute error calculated with <a href="https://rdrr.io/cran/hydroGOF/man/mae.html" class="external-link">hydroGOF::mae</a>, and
+using a power transformation with exponent -0.5.</p>
+<p><strong>Note:</strong> All these (and other) string combinations can
+also be used for calibration with applying it to
+<code>error_crit_transfo</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># validation settings</span></span>
 <span><span class="va">val_crit_transfo</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"KGE__none"</span>, <span class="st">"NSE__none"</span>, <span class="st">"VE__none"</span>, <span class="st">"pbias__none"</span>, <span class="st">"mae__none"</span>, <span class="st">"mse__none"</span>,</span>
 <span>                      <span class="st">"KGE__power__0.2"</span>,  <span class="st">"NSE__power__0.2"</span>, <span class="st">"mae__power__0.2"</span>, <span class="st">"mse__power__0.2"</span>,</span>
 <span>                      <span class="st">"KGE__boxcoxsantos"</span>, <span class="st">"NSE__boxcoxsantos"</span>, <span class="st">"mae__boxcoxsantos"</span>, <span class="st">"mse__boxcoxsantos"</span>,</span>
@@ -299,18 +313,15 @@ using a power transformation with exponent 0.2.</p>
 <span>                      <span class="st">"KGE__power__-0.5"</span>, <span class="st">"NSE__power__-0.5"</span>, <span class="st">"mae__power__-0.5"</span>, <span class="st">"mse__power__-0.5"</span><span class="op">)</span></span></code></pre></div>
 <p>Define the subseasons for which the above defined metrics are
 calculated for:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># a list with names and arrays of two digits describing months used to calculate</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># a list with names and arrays of two digits describing months used to calculate</span></span>
 <span><span class="co"># subseasonal validation metrics</span></span>
 <span><span class="va">val_subseason</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>spring <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"02"</span>, <span class="st">"03"</span>, <span class="st">"04"</span>, <span class="st">"05"</span><span class="op">)</span>, </span>
 <span>                      summer <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"06"</span>, <span class="st">"07"</span>, <span class="st">"08"</span>, <span class="st">"09"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Calculate (sub)seasonal metrics. It will automatically calculate
 performance metrics for the whole year (all).</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span></span>
-<span><span class="co"># calculate performance metrics for calibration period</span></span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># calculate performance metrics for calibration period</span></span>
 <span><span class="va">perf_cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calc_subseasonal_validation_results.html">calc_subseasonal_validation_results</a></span><span class="op">(</span><span class="va">val_subseason</span>, <span class="va">hydro_data</span><span class="op">$</span><span class="va">BasinObs</span><span class="op">$</span><span class="va">DatesR</span>,</span>
 <span>                                                <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_cal</span>, <span class="st">"calibration"</span>,</span>
 <span>                                                col_name <span class="op">=</span> <span class="st">"period"</span>,</span>
@@ -326,8 +337,9 @@ performance metrics for the whole year (all).</p>
 <span></span>
 <span><span class="co"># combine periods in one data frame</span></span>
 <span><span class="va">perf_df</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">perf_cal</span>, <span class="va">perf_val</span><span class="op">)</span></span></code></pre></div>
-<p>Show the results which is a tibble:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p>Show the results which is a tibble. Lambda is the exponent if a power
+transformation is used …</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">perf_df</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr>
@@ -343,7 +355,7 @@ performance metrics for the whole year (all).</p>
 <td align="left">KGE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.8011308</td>
+<td align="right">0.7973755</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -351,7 +363,7 @@ performance metrics for the whole year (all).</p>
 <td align="left">NSE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.6252017</td>
+<td align="right">0.6182080</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -359,7 +371,7 @@ performance metrics for the whole year (all).</p>
 <td align="left">VE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.5810047</td>
+<td align="right">0.5735131</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -367,7 +379,7 @@ performance metrics for the whole year (all).</p>
 <td align="left">pbias</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">2.5000000</td>
+<td align="right">3.6000000</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -375,7 +387,7 @@ performance metrics for the whole year (all).</p>
 <td align="left">mae</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">1.8935971</td>
+<td align="right">1.9274545</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -383,16 +395,15 @@ performance metrics for the whole year (all).</p>
 <td align="left">mse</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">9.5105067</td>
+<td align="right">9.6879706</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
 </tbody>
 </table>
-<p>This result can be stored as ascii file</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># write ascii results overview</span></span>
+<p>This result can be stored as ascii file:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># write ascii results overview</span></span>
 <span><span class="fu"><a href="../reference/write_ascii.html">write_ascii</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"perf_ascii.txt"</span><span class="op">)</span>,</span>
 <span>  <span class="co"># to include also the parameters</span></span>
@@ -400,9 +411,8 @@ performance metrics for the whole year (all).</p>
 <span>  <span class="va">perf_df</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>All results can be stored as a binary</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># for this split sim in calibration and validation periods</span></span>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># for this split sim in calibration and validation periods</span></span>
 <span><span class="va">sim_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">sim_list</span><span class="op">$</span><span class="va">cal</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/subset_simulations.html">subset_simulations</a></span><span class="op">(</span><span class="va">split_indices</span><span class="op">$</span><span class="va">ind_cal</span>, <span class="va">sim</span><span class="op">)</span></span>
 <span><span class="va">sim_list</span><span class="op">$</span><span class="va">val</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/subset_simulations.html">subset_simulations</a></span><span class="op">(</span><span class="va">split_indices</span><span class="op">$</span><span class="va">ind_val</span>, <span class="va">sim</span><span class="op">)</span></span>
@@ -423,10 +433,11 @@ performance metrics for the whole year (all).</p>
 <h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
 <p>Choose a different model, or a snow module/hydrological model
-combination, a different calibration function and streamflow
-transformation for calibration
+combination, or a different calibration function (see
+<code><a href="../articles/calibration_methods_overview.html">vignette("calibration_methods_overview")</a></code> for a complete
+list), or a different streamflow transformation for calibration
 (e.g. <code>error_crit_transfo &lt;- "NSE__power__0.2"</code>) or do it
-in a different subbasin, with filtering the example data to a different
+in a different subbasin with filtering the example data to a different
 HSU_ID.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
