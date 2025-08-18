@@ -12,7 +12,7 @@
 
 <meta name="author" content="Michael Schirmer" />
 
-<meta name="date" content="2025-08-14" />
+<meta name="date" content="2025-08-18" />
 
 <title>Calibration and validation</title>
 
@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Calibration and validation</h1>
 <h4 class="author">Michael Schirmer</h4>
-<h4 class="date">2025-08-14</h4>
+<h4 class="date">2025-08-18</h4>
 
 
 
@@ -381,55 +381,54 @@ transformation applied (here <code>KGE</code> and <code>none</code>
 separated by a <code>__</code>), and whether you want to transform
 parameters to a hypercube.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cal_fn <span class="ot">&lt;-</span> <span class="st">&quot;steepest_descent&quot;</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>error_crit_transfo <span class="ot">&lt;-</span> <span class="st">&quot;KGE__none&quot;</span></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>do_transfo_param <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span></code></pre></div>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>error_crit_transfo <span class="ot">&lt;-</span> <span class="st">&quot;KGE__none&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>do_transfo_param <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span></code></pre></div>
 <p>Put basin information in a list. (todo: some redundancy with input,
 needs to be solved in future releases)</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>hydro_data <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>hydro_data<span class="sc">$</span>BasinObs <span class="ot">&lt;-</span> minimum_input</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># todo: also this needs to be updated for topmodel for example</span></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>minimum_basin_info <span class="ot">&lt;-</span> basin_data[[<span class="st">&quot;2303&quot;</span>]]</span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co"># todo: delete HypsoData in general</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>minimum_basin_info<span class="sc">$</span>HypsoData <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>hydro_data<span class="sc">$</span>BasinInfo <span class="ot">&lt;-</span> minimum_basin_info</span></code></pre></div>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co"># basin_data is an example data loaded with openQUARREL</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>minimum_basin_info <span class="ot">&lt;-</span> basin_data[[<span class="st">&quot;2303&quot;</span>]]</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co"># delete HypsoData not needed here</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>minimum_basin_info<span class="sc">$</span>HypsoData <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>hydro_data<span class="sc">$</span>BasinInfo <span class="ot">&lt;-</span> minimum_basin_info</span></code></pre></div>
 <p>Calibrate the model.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># calibrate the model</span></span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>calibration_results <span class="ot">&lt;-</span> <span class="fu">calibrate_model</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  hydro_data, split_indices, model, input,</span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">cal_fn =</span> cal_fn, <span class="at">do_transfo_param =</span> do_transfo_param</span>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">suppressWarnings</span>() <span class="sc">%&gt;%</span> <span class="fu">suppressMessages</span>()</span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Random sampling with method steepest_descent finished in 1.677 secs with best value 0.79...</span></span></code></pre></div>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Random sampling with method steepest_descent finished in 1.679 secs with best value 0.77...</span></span></code></pre></div>
 <p>Show calibration results:</p>
-<p>Calibration finished in 34.807 sec with best criterion 0.8199668 with
+<p>Calibration finished in 12.662 sec with best criterion 0.8176636 with
 the model parameters:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># get the parameter names and print</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">names</span>(calibration_results<span class="sc">$</span>model_param) <span class="ot">&lt;-</span> default_cal_par[[model]]<span class="sc">$</span>lower</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">names</span>(calibration_results<span class="sc">$</span>model_param) <span class="ot">&lt;-</span> <span class="fu">names</span>(default_cal_par[[model]]<span class="sc">$</span>lower)</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">print</span>(calibration_results<span class="sc">$</span>model_param)</span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt;          0.9            0            1           -3           -2            0 </span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt;   1.45051064   0.73756290   1.59738092  -3.00000000  -1.57810040   1.00000000 </span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;            0            0            0            2           30            1 </span></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; 115.36800821   6.45433379   1.90786817   6.20856890  30.00000000   9.82756322 </span></span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt;            0            0            0 </span></span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;   0.09240309   0.00000000  44.17444916</span></span></code></pre></div>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co">#&gt;         SCF         DDF          Tr          Ts          Tm       LPrat </span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt;   1.4468337   0.9938764   1.0200000  -3.0000000   0.3977515   1.0000000 </span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt;          FC        BETA          k0          k1          k2        lsuz </span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; 127.0488478   6.8634524   0.8118232  20.7600000 250.0000000   5.3186449 </span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt;       cperc        bmax      croute </span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;   0.0000000   3.9144990  18.6240784</span></span></code></pre></div>
 <p>There is more information after calibration,
-<code>calibration_results</code> is a list of storing also under the
-entry <code>more_info</code> output of the chosen calibration
+<code>calibration_results</code> is a list of storing also the used
+calibration settings <code>cal_par</code> and with
+<code>more_info</code> the output of the chosen calibration
 function.</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">str</span>(calibration_results)</span>
 <span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; List of 12</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt;  $ model                 : chr &quot;TUW&quot;</span></span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt;  $ snow_module           : NULL</span></span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt;  $ model_param           : Named num [1:15] 1.451 0.738 1.597 -3 -1.578 ...</span></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;names&quot;)= chr [1:15] &quot;0.9&quot; &quot;0&quot; &quot;1&quot; &quot;-3&quot; ...</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt;  $ model_param           : Named num [1:15] 1.447 0.994 1.02 -3 0.398 ...</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;names&quot;)= chr [1:15] &quot;SCF&quot; &quot;DDF&quot; &quot;Tr&quot; &quot;Ts&quot; ...</span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt;  $ preset_snow_parameters: logi FALSE</span></span>
 <span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt;  $ cal_fn                : chr &quot;steepest_descent&quot;</span></span>
 <span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt;  $ error_crit_transfo    : chr &quot;KGE__none&quot;</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt;  $ error_crit_val        : num 0.82</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="co">#&gt;  $ error_crit_val        : num 0.818</span></span>
 <span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co">#&gt;  $ cal_maximize          : logi TRUE</span></span>
 <span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co">#&gt;  $ do_transfo_param      : logi TRUE</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt;  $ duration              : &#39;difftime&#39; num 34.807</span></span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt;  $ duration              : &#39;difftime&#39; num 12.662</span></span>
 <span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a><span class="co">#&gt;   ..- attr(*, &quot;units&quot;)= chr &quot;secs&quot;</span></span>
 <span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a><span class="co">#&gt;  $ cal_par               :List of 7</span></span>
 <span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co">#&gt;   ..$ lower          : Named num [1:15] 0.9 0 1 -3 -2 0 0 0 0 2 ...</span></span>
@@ -451,15 +450,15 @@ function.</p>
 <span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt;   .. .. ..$ maxit     : num 50</span></span>
 <span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt;   .. .. ..$ reltol    : num 1e-10</span></span>
 <span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt;  $ more_info             :List of 8</span></span>
-<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt;   ..$ ParamFinalR  : num [1:15] 0.918 0.148 0.299 0 0.105 ...</span></span>
-<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt;   ..$ CritFinal    : num -0.82</span></span>
-<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt;   ..$ NIter        : num 150</span></span>
-<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt;   ..$ NRuns        : num 3875</span></span>
-<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a><span class="co">#&gt;   ..$ HistParamR   : num [1:150, 1:15] 0.798 0.798 0.798 1 1 ...</span></span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt;   ..$ ParamFinalR  : num [1:15] 0.911 0.199 0.01 0 0.599 ...</span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt;   ..$ CritFinal    : num -0.818</span></span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt;   ..$ NIter        : num 47</span></span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt;   ..$ NRuns        : num 1144</span></span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a><span class="co">#&gt;   ..$ HistParamR   : num [1:47, 1:15] 0.591 0.591 0.591 0.591 0.591 ...</span></span>
 <span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a><span class="co">#&gt;   .. ..- attr(*, &quot;dimnames&quot;)=List of 2</span></span>
 <span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a><span class="co">#&gt;   .. .. ..$ : NULL</span></span>
 <span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a><span class="co">#&gt;   .. .. ..$ : chr [1:15] &quot;Param1&quot; &quot;Param2&quot; &quot;Param3&quot; &quot;Param4&quot; ...</span></span>
-<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a><span class="co">#&gt;   ..$ HistCrit     : num [1:150, 1] -0.786 -0.788 -0.789 -0.79 -0.791 ...</span></span>
+<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a><span class="co">#&gt;   ..$ HistCrit     : num [1:47, 1] -0.767 -0.789 -0.802 -0.806 -0.807 ...</span></span>
 <span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a><span class="co">#&gt;   ..$ CritName     : chr &quot;KGE_none&quot;</span></span>
 <span id="cb8-45"><a href="#cb8-45" tabindex="-1"></a><span class="co">#&gt;   ..$ CritBestValue: NULL</span></span></code></pre></div>
 <p>Simulate model, similar to
@@ -585,7 +584,7 @@ transformation is used …</p>
 <td align="left">KGE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.7997771</td>
+<td align="right">0.7938678</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -593,7 +592,7 @@ transformation is used …</p>
 <td align="left">NSE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.6226984</td>
+<td align="right">0.6073366</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -601,7 +600,7 @@ transformation is used …</p>
 <td align="left">VE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.5827103</td>
+<td align="right">0.5619887</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -609,7 +608,7 @@ transformation is used …</p>
 <td align="left">pbias</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">3.2000000</td>
+<td align="right">3.3000000</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -617,7 +616,7 @@ transformation is used …</p>
 <td align="left">mae</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">1.8858888</td>
+<td align="right">1.9795376</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -625,7 +624,7 @@ transformation is used …</p>
 <td align="left">mse</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">9.5740282</td>
+<td align="right">9.9638341</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>

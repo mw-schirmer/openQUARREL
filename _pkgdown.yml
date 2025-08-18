@@ -10,4 +10,20 @@ articles:
   - include_snow_module
   - calibration_methods_overview
   - calibrate_validate
+authors:
+- name: Michael Schirmer
+  roles:
+  - aut
+  - cre
+  email: michael.schirmer@wsl.ch
+  orcid: 0000-0002-1097-8550
+- name: Dorothea Hug Peter
+  roles: aut
+  email: dorothea.hug@scnat.ch
+- name: Florian Lustenberger
+  roles: aut
+  email: florian.lustenberger@innetag.ch
+- name: Massimiliano Zappa
+  roles: fnd
+  email: zappa@wsl.ch
 
