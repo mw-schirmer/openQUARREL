@@ -275,7 +275,7 @@ saveRDS(
     simulation_val = sim_list$val,
     simulation_cal = sim_list$cal,
     sim_more_info = sim_list$more_info,
-    validation = validation_results
+    validation = perf_df
   ),
   file.path(output_folder, "results_binary.rds")
 )
