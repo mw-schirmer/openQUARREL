@@ -92,18 +92,16 @@ example.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mw-schirmer.github.io/openQUARREL/">openQUARREL</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
-<p>Load data</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">input_data</span><span class="op">)</span></span></code></pre></div>
 <p>Create a minimum input</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># can be done as separate data set</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># input_data is an example input loaded with openQUARREL</span></span>
 <span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="co"># filter to a single catchment, i.e. Thur at Jonschwil</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">HSU_ID</span> <span class="op">==</span> <span class="st">"2303"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="co"># select only a few columns</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">DatesR</span>, <span class="va">P</span>, <span class="cn">T</span>, <span class="va">E</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># convert Date to POSIXct</span></span>
-<span><span class="co"># todo: put it into input_data already, but is also good to show it here</span></span>
 <span><span class="va">minimum_input</span><span class="op">$</span><span class="va">DatesR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="va">minimum_input</span><span class="op">$</span><span class="va">DatesR</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">minimum_input</span><span class="op">$</span><span class="va">DatesR</span>, <span class="st">"tzone"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UTC"</span></span></code></pre></div>
 <p>The data frame <code>minimum_input</code> contains columns
@@ -159,9 +157,11 @@ there are functions available, e.g. in <a href="https://rdrr.io/cran/airGR/man/
 </tbody>
 </table>
 <p>Choose a hydrological model</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cal_par</span> <span class="op">&lt;-</span> <span class="va">default_cal_par</span> <span class="co"># todo: this needs to be changed</span></span>
-<span><span class="co"># todo: topmodel is not running right now as the BasinInfo is not provided in example data</span></span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># default_cal_par are default calibration parameter loaded with openQUARREL</span></span>
+<span><span class="co"># todo: cal_par needs to be a global parameter currently, needs to be changed in future releases</span></span>
+<span><span class="va">cal_par</span> <span class="op">&lt;-</span> <span class="va">default_cal_par</span> </span>
+<span><span class="co"># todo: topmodel is not running right now as the required BasinInfo is not provided in example data</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"TUW"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="set-model-parameters">Set model parameters<a class="anchor" aria-label="anchor" href="#set-model-parameters"></a>
@@ -172,8 +172,8 @@ documentation for parameter explanation. The list
 <code>default_cal_par</code> is loaded with
 <code><a href="https://mw-schirmer.github.io/openQUARREL/">library(openQUARREL)</a></code> and holds model and calibration
 specific settings.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">param</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">default_cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">upper</span> <span class="op">+</span> <span class="va">default_cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">lower</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">param</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">upper</span> <span class="op">+</span> <span class="va">default_cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">lower</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    SCF    DDF     Tr     Ts     Tm  LPrat     FC   BETA     k0     k1     k2 </span></span>
 <span><span class="co">#&gt;    1.2    2.5    2.0   -1.0    0.0    0.5  300.0   10.0    1.0   16.0  140.0 </span></span>
@@ -184,15 +184,15 @@ specific settings.</p>
 <h3 id="create-input">Create input<a class="anchor" aria-label="anchor" href="#create-input"></a>
 </h3>
 <p>This is done specifically for each model/package requirement, here <a href="https://rdrr.io/cran/TUWmodel/man/TUWmodel.html" class="external-link">TUWmodel</a>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># todo: check on basin_info</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># todo: the last input can be empty, will be not required in a future release </span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_input.html">create_input</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">minimum_input</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="run-the-model">Run the model<a class="anchor" aria-label="anchor" href="#run-the-model"></a>
 </h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">param</span>, <span class="va">input</span><span class="op">)</span></span></code></pre></div>
 <p>The output is a list with fields date, Qsim, Qobs, SWE, psolid,
 pliquid, melt, more_info. You can access typical components as simulated
@@ -204,7 +204,7 @@ the model or chosen to be added (see
 <code>pliquid</code> and <code>psolid</code>, and the snow
 <code>melt</code> flux. The element <code>more_info</code> is specific
 to the chosen model and package, in this case <a href="https://rdrr.io/cran/TUWmodel/man/TUWmodel.html" class="external-link">TUWmodel</a>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 8</span></span>
 <span><span class="co">#&gt;  $ date     : Date[1:14853], format: "1981-01-01" "1981-01-02" ...</span></span>
@@ -249,7 +249,7 @@ to the chosen model and package, in this case <a href="https://rdrr.io/cran/TUWm
 </h2>
 <p>Here is a simple plot for simulated discharge with skipping the first
 ~3 years (warm-up):</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">[</span><span class="fl">3</span><span class="op">*</span><span class="fl">365</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">]</span>, <span class="va">sim</span><span class="op">$</span><span class="va">Qsim</span><span class="op">[</span><span class="fl">3</span><span class="op">*</span><span class="fl">365</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">]</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"Simulated Discharge"</span>, ylab <span class="op">=</span> <span class="st">"Q [mm/d]"</span>, xlab <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="run_model_minimalistic_files/figure-html/plot-1.png" width="700"></p>
 </div>

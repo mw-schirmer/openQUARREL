@@ -95,31 +95,25 @@ Important new parts are in <em>italic</em>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mw-schirmer.github.io/openQUARREL/">openQUARREL</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
-<p>Load data</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">input_data</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">basin_data</span><span class="op">)</span></span></code></pre></div>
 <p>Create a minimum input</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># can be done as separate data set</span></span>
-<span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">HSU_ID</span> <span class="op">==</span> <span class="st">"2303"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">DatesR</span>, <span class="va">P</span>, <span class="cn">T</span>, <span class="va">E</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># convert Date to POSIXct</span></span>
-<span><span class="co"># todo: put it into input_data already, but is also good to show it here</span></span>
 <span><span class="va">minimum_input</span><span class="op">$</span><span class="va">DatesR</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="va">minimum_input</span><span class="op">$</span><span class="va">DatesR</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">minimum_input</span><span class="op">$</span><span class="va">DatesR</span>, <span class="st">"tzone"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"UTC"</span></span></code></pre></div>
 <p>New parts are in italic:</p>
 <p><em>Choose a snow module and a hydrological model (without an own
 snow module)</em></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cal_par</span> <span class="op">&lt;-</span> <span class="va">default_cal_par</span> <span class="co"># todo: this needs to be changed</span></span>
 <span><span class="va">snow_module</span> <span class="op">&lt;-</span> <span class="st">"CemaNeige"</span></span>
-<span><span class="co"># todo: topmodel is not running right now as the BasinInfo is not provided in example data</span></span>
+<span><span class="co"># todo: topmodel is not running right now as the required BasinInfo is not provided in example data</span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="st">"sacramento"</span></span></code></pre></div>
 <p>Set model parameters</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">param</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">default_cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">upper</span> <span class="op">+</span> <span class="va">default_cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">lower</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">param</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       uztwm       uzfwm         uzk       pctim       adimp       zperc </span></span>
@@ -129,21 +123,21 @@ snow module)</em></p>
 <span><span class="co">#&gt;       pfree </span></span>
 <span><span class="co">#&gt;   0.3000000</span></span></code></pre></div>
 <p><em>Set snow module parameters</em></p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">snow_param</span> <span class="op">&lt;-</span> <span class="op">(</span><span class="va">default_cal_par</span><span class="op">[[</span><span class="va">snow_module</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">upper</span> <span class="op">+</span> <span class="va">default_cal_par</span><span class="op">[[</span><span class="va">snow_module</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">lower</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">snow_param</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1]  0.50000 54.51825</span></span></code></pre></div>
 <p>Create input</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># todo: check on basin_info</span></span>
 <span><span class="va">input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_input.html">create_input</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">minimum_input</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><em>Create snow input</em></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">snow_input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_input.html">create_input</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">minimum_input</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Run the model without the snow module</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">param</span>, <span class="va">input</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -151,25 +145,25 @@ snow module)</em></p>
 <em>Run the model with the snow module</em><a class="anchor" aria-label="anchor" href="#run-the-model-with-the-snow-module"></a>
 </h3>
 <p><em>Simulate snow module</em></p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># simulate snow module</span></span>
 <span><span class="va">snow_module_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_snow.html">simulate_snow</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">snow_param</span>, <span class="va">snow_input</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Update precipitation with snow module surface water runoff</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">input</span><span class="op">$</span><span class="va">P</span> <span class="op">&lt;-</span> <span class="va">snow_module_results</span><span class="op">$</span><span class="va">surface_water_runoff</span></span></code></pre></div>
 <p>Run the model with updated input*</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim_update</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_model.html">simulate_model</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">param</span>, <span class="va">input</span><span class="op">)</span></span></code></pre></div>
 <p>Combine snow and runoff results (not required, just nice)</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim_update</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/merge_snow_runoff_sim.html">merge_snow_runoff_sim</a></span><span class="op">(</span><span class="va">sim_update</span>, <span class="va">snow_module_results</span><span class="op">)</span></span></code></pre></div>
 <p>The output contains now also the snow module results
 <code>SWE</code>, <code>psolid</code>, <code>pliquid</code> and
 <code>melt</code>, and <code>more_info</code> contains a list of 2, i.e
 both the complete hydrological model and the snow module results with
 all details directly from the original package output.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sim_update</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 9</span></span>
 <span><span class="co">#&gt;  $ date                : Date[1:14853], format: "1981-01-01" "1981-01-02" ...</span></span>
@@ -197,7 +191,7 @@ all details directly from the original package output.</p>
 <span><span class="co">#&gt;   .. .. .. ..$ lzsk : num [1:2] 0.01 0.25</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ lzpk : num [1:2] 0.0001 0.25</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ pfree: num [1:2] 0 0.6</span></span>
-<span><span class="co">#&gt;   .. .. ..$ last.updated: POSIXct[1:1], format: "2025-08-14 20:39:33"</span></span>
+<span><span class="co">#&gt;   .. .. ..$ last.updated: POSIXct[1:1], format: "2025-08-18 10:43:33"</span></span>
 <span><span class="co">#&gt;   .. .. ..$ sma         : chr "sacramento"</span></span>
 <span><span class="co">#&gt;   .. .. ..$ sma.fun     : chr "sacramento.sim"</span></span>
 <span><span class="co">#&gt;   .. .. ..$ sma.formals :Dotted pair list of 24</span></span>
@@ -243,7 +237,7 @@ all details directly from the original package output.</p>
 <span><span class="co">#&gt;   .. .. .. ..$ lzsk : num 0.13</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ lzpk : num 0.125</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ pfree: num 0.3</span></span>
-<span><span class="co">#&gt;   .. .. ..$ last.updated: POSIXct[1:1], format: "2025-08-14 20:39:33"</span></span>
+<span><span class="co">#&gt;   .. .. ..$ last.updated: POSIXct[1:1], format: "2025-08-18 10:43:33"</span></span>
 <span><span class="co">#&gt;   .. .. ..$ sma         : chr "sacramento"</span></span>
 <span><span class="co">#&gt;   .. .. ..$ sma.fun     : chr "sacramento.sim"</span></span>
 <span><span class="co">#&gt;   .. .. ..$ sma.formals :Dotted pair list of 24</span></span>
@@ -322,7 +316,7 @@ all details directly from the original package output.</p>
 </h3>
 <p>Here is a simple plot for simulated discharge with (red) and without
 (black) the snow module, skipping the first ~3 years (warm-up):</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">[</span><span class="fl">3</span><span class="op">*</span><span class="fl">365</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">]</span>, <span class="va">sim</span><span class="op">$</span><span class="va">Qsim</span><span class="op">[</span><span class="fl">3</span><span class="op">*</span><span class="fl">365</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">]</span>, type <span class="op">=</span> <span class="st">"l"</span>, main <span class="op">=</span> <span class="st">"Simulated Discharge"</span>, ylab <span class="op">=</span> <span class="st">"Q [mm/d]"</span>, xlab <span class="op">=</span> <span class="st">"Date"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">sim_update</span><span class="op">$</span><span class="va">date</span><span class="op">[</span><span class="fl">3</span><span class="op">*</span><span class="fl">365</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">]</span>, <span class="va">sim_update</span><span class="op">$</span><span class="va">Qsim</span><span class="op">[</span><span class="fl">3</span><span class="op">*</span><span class="fl">365</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">date</span><span class="op">)</span><span class="op">]</span>, col<span class="op">=</span><span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="include_snow_module_files/figure-html/plot-1.png" width="700"></p>
