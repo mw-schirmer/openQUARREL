@@ -72,7 +72,6 @@ and whether you want to transform parameters to a hypercube.
 
 ```{r calibration_settings}
 cal_fn <- "steepest_descent"
-
 error_crit_transfo <- "KGE__none"
 do_transfo_param <- TRUE
 ```
@@ -83,10 +82,9 @@ Put basin information in a list.
 ```{r hydro_data}
 hydro_data <- list()
 hydro_data$BasinObs <- minimum_input
-
-# todo: also this needs to be updated for topmodel for example
+# basin_data is an example data loaded with openQUARREL
 minimum_basin_info <- basin_data[["2303"]]
-# todo: delete HypsoData in general
+# delete HypsoData not needed here
 minimum_basin_info$HypsoData <- NULL
 hydro_data$BasinInfo <- minimum_basin_info
 ```
@@ -110,13 +108,13 @@ Calibration finished in `r calibration_results$duration %>% as.numeric()` sec wi
 
 ```{r calibration_results}
 # get the parameter names and print
-names(calibration_results$model_param) <- default_cal_par[[model]]$lower
+names(calibration_results$model_param) <- names(default_cal_par[[model]]$lower)
 print(calibration_results$model_param)
 ```
 
 
 There is more information after calibration, `calibration_results` is a list of 
-storing also under the entry `more_info` output of the chosen calibration function.
+storing also the used calibration settings `cal_par` and with `more_info` the output of the chosen calibration function.
 
 ```{r calibration_results_all}
 str(calibration_results)

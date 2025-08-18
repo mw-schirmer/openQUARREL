@@ -55,7 +55,7 @@ knitr::kable(
 
 ## Snow modules
 
-Snow modules included and tested in the openQUARREL package. TUWsnow is the snow module of TUWmodel. The snow module of snow is not implemented yet.
+Snow modules included and tested in the openQUARREL package. TUWsnow is the snow module of TUWmodel. The snow module of snow is not separately implemented yet.
 
 ```{r, echo=FALSE}
 

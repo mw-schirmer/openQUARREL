@@ -31,21 +31,13 @@ library(openQUARREL)
 library(dplyr)
 ```
 
-Load data
-```{r load data}
-data(input_data)
-data(basin_data)
-```
-
 Create a minimum input
 ```{r minimum data}
-# can be done as separate data set
 minimum_input <- input_data %>% 
   filter(HSU_ID == "2303") %>% 
   select(DatesR, P, T, E)
 
 # convert Date to POSIXct
-# todo: put it into input_data already, but is also good to show it here
 minimum_input$DatesR <- as.POSIXct(minimum_input$DatesR)
 attr(minimum_input$DatesR, "tzone") <- "UTC"
 ```
@@ -56,7 +48,7 @@ New parts are in italic:
 ```{r settings}
 cal_par <- default_cal_par # todo: this needs to be changed
 snow_module <- "CemaNeige"
-# todo: topmodel is not running right now as the BasinInfo is not provided in example data
+# todo: topmodel is not running right now as the required BasinInfo is not provided in example data
 model <- "sacramento"
 ```
 

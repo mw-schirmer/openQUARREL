@@ -32,20 +32,16 @@ library(dplyr)
 ```
 
 
-Load data
-```{r load data}
-data(input_data)
-```
-
 Create a minimum input
 ```{r minimum data}
-# can be done as separate data set
+# input_data is an example input loaded with openQUARREL
 minimum_input <- input_data %>% 
+  # filter to a single catchment, i.e. Thur at Jonschwil
   filter(HSU_ID == "2303") %>% 
+  # select only a few columns
   select(DatesR, P, T, E)
 
 # convert Date to POSIXct
-# todo: put it into input_data already, but is also good to show it here
 minimum_input$DatesR <- as.POSIXct(minimum_input$DatesR)
 attr(minimum_input$DatesR, "tzone") <- "UTC"
 ```
@@ -58,8 +54,10 @@ knitr::kable(head(minimum_input))
 
 Choose a hydrological model
 ```{r settings}
-cal_par <- default_cal_par # todo: this needs to be changed
-# todo: topmodel is not running right now as the BasinInfo is not provided in example data
+# default_cal_par are default calibration parameter loaded with openQUARREL
+# todo: cal_par needs to be a global parameter currently, needs to be changed in future releases
+cal_par <- default_cal_par 
+# todo: topmodel is not running right now as the required BasinInfo is not provided in example data
 model <- "TUW"
 ```
 
@@ -67,7 +65,7 @@ model <- "TUW"
 
 Create a parameter set, which is here the middle points of the provided intervals. See [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html) documentation for parameter explanation. The list `default_cal_par` is loaded with `library(openQUARREL)` and holds model and calibration specific settings. 
 ```{r param}
-param <- (default_cal_par[[model]]$upper + default_cal_par[[model]]$lower) / 2
+param <- (cal_par[[model]]$upper + default_cal_par[[model]]$lower) / 2
 print(param)
 ```
 
@@ -75,7 +73,7 @@ print(param)
 
 This is done specifically for each model/package requirement, here [TUWmodel](https://rdrr.io/cran/TUWmodel/man/TUWmodel.html).
 ```{r input}
-# todo: check on basin_info
+# todo: the last input can be empty, will be not required in a future release 
 input <- create_input(model, minimum_input, list())
 ```
 
