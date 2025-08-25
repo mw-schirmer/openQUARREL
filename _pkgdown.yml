@@ -1,6 +1,12 @@
 url: https://mw-schirmer.github.io/openQUARREL/
 template:
   bootstrap: 5
+navbar:
+  right:
+    - text: "Manual (PDF)"
+      href: "openQUARREL_manual.pdf"
+    - text: "Vignettes (PDF)"
+      href: "Vignettes_Combined.pdf"
 articles:
 - title: Articles
   navbar: ~
