@@ -7,7 +7,7 @@ articles:
   include_snow_module: include_snow_module.html
   model_overview: model_overview.html
   run_model_minimalistic: run_model_minimalistic.html
-last_built: 2025-08-25T10:38Z
+last_built: 2025-08-25T10:49Z
 urls:
   reference: https://mw-schirmer.github.io/openQUARREL/reference
   article: https://mw-schirmer.github.io/openQUARREL/articles
