@@ -88,3 +88,7 @@ for example done in the [assets of (Astagneau et al.,
 provided an example on how to [prepare data and run a model with the
 TUWmodel
 package](https://github.com/hydroGR/hydroModPkgR-article/blob/master/hydromad_mountainous.R).
+
+## Contact
+
+[Michael Schirmer](mailto:michael.schirmer@wsl.ch)

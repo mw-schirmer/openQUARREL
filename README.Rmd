@@ -63,3 +63,6 @@ The code is available to download under https://github.com/mw-schirmer/openQUARR
 ## Your contribution
 
 If you want your model to be included I simply need a code snippet as for example done in the [assets of (Astagneau et al., 2021)](https://github.com/hydroGR/hydroModPkgR-article). Here they provided an example on how to [prepare data and run a model with the TUWmodel package](https://github.com/hydroGR/hydroModPkgR-article/blob/master/hydromad_mountainous.R).
+
+## Contact
+[Michael Schirmer](mailto:michael.schirmer@wsl.ch)
