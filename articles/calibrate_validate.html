@@ -33,7 +33,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">openQUARREL</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="nav-link" href="../openQUARREL_manual.pdf">Manual (PDF)</a>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../Vignettes_Combined.pdf">Vignettes (PDF)</a>
+</li>
+      </ul>
 </div>
 
     
@@ -76,7 +83,7 @@
                         <h4 data-toc-skip class="author">Michael
 Schirmer</h4>
             
-            <h4 data-toc-skip class="date">2025-08-18</h4>
+            <h4 data-toc-skip class="date">2025-08-25</h4>
       
       
       <div class="d-none name"><code>calibrate_validate.Rmd</code></div>
@@ -117,10 +124,10 @@ ignored, openQUARREL is using only non-affected parts of hydroGOF.</p>
 <span><span class="co">#&gt;  Checking rgeos availability: FALSE</span></span></code></pre></div>
 <p>… and observed streamflow (column Qmm) from the example data set.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">HSU_ID</span> <span class="op">==</span> <span class="st">"2303"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">DatesR</span>, <span class="va">Qmm</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">minimum_input</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/join_by.html" class="external-link">join_by</a></span><span class="op">(</span><span class="va">DatesR</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">minimum_input</span> <span class="op">&lt;-</span> <span class="va">input_data</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">HSU_ID</span> <span class="op">==</span> <span class="st">"2303"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">DatesR</span>, <span class="va">Qmm</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">inner_join</span><span class="op">(</span><span class="va">minimum_input</span>, <span class="fu">join_by</span><span class="op">(</span><span class="va">DatesR</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Define periods for warm-up, calibration and validation:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># split data set</span></span>
@@ -158,21 +165,21 @@ needs to be solved in future releases)</p>
 <span><span class="va">calibration_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calibrate_model.html">calibrate_model</a></span><span class="op">(</span></span>
 <span>  <span class="va">hydro_data</span>, <span class="va">split_indices</span>, <span class="va">model</span>, <span class="va">input</span>,</span>
 <span>  cal_fn <span class="op">=</span> <span class="va">cal_fn</span>, do_transfo_param <span class="op">=</span> <span class="va">do_transfo_param</span></span>
-<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Random sampling with method steepest_descent finished in 2.593 secs with best value 0.78...</span></span></code></pre></div>
+<span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Random sampling with method steepest_descent finished in 1.354 secs with best value 0.76...</span></span></code></pre></div>
 <p>Show calibration results:</p>
-<p>Calibration finished in 23.584 sec with best criterion 0.8222352 with
+<p>Calibration finished in 10.661 sec with best criterion 0.8159283 with
 the model parameters:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># get the parameter names and print</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">calibration_results</span><span class="op">$</span><span class="va">model_param</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">default_cal_par</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">lower</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">calibration_results</span><span class="op">$</span><span class="va">model_param</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         SCF         DDF          Tr          Ts          Tm       LPrat </span></span>
-<span><span class="co">#&gt;   1.4633128   0.7771679   1.2000000  -3.0000000  -0.9942945   1.0000000 </span></span>
-<span><span class="co">#&gt;          FC        BETA          k0          k1          k2        lsuz </span></span>
-<span><span class="co">#&gt;  93.3765441   7.3128588   0.5238339   2.0000000 250.0000000  37.0435965 </span></span>
-<span><span class="co">#&gt;       cperc        bmax      croute </span></span>
-<span><span class="co">#&gt;   0.0000000   0.0000000  50.0000000</span></span></code></pre></div>
+<span><span class="co">#&gt;        SCF        DDF         Tr         Ts         Tm      LPrat         FC </span></span>
+<span><span class="co">#&gt;  1.4271997  1.1534126  1.0000000 -3.0000000  1.2000000  1.0000000 98.9525044 </span></span>
+<span><span class="co">#&gt;       BETA         k0         k1         k2       lsuz      cperc       bmax </span></span>
+<span><span class="co">#&gt;  5.5283622  0.6773406  9.3971982 30.0000000 10.6048493  0.7316858 28.8000000 </span></span>
+<span><span class="co">#&gt;     croute </span></span>
+<span><span class="co">#&gt; 20.6863800</span></span></code></pre></div>
 <p>There is more information after calibration,
 <code>calibration_results</code> is a list of storing also the used
 calibration settings <code>cal_par</code> and with
@@ -183,15 +190,15 @@ function.</p>
 <span><span class="co">#&gt; List of 12</span></span>
 <span><span class="co">#&gt;  $ model                 : chr "TUW"</span></span>
 <span><span class="co">#&gt;  $ snow_module           : NULL</span></span>
-<span><span class="co">#&gt;  $ model_param           : Named num [1:15] 1.463 0.777 1.2 -3 -0.994 ...</span></span>
+<span><span class="co">#&gt;  $ model_param           : Named num [1:15] 1.43 1.15 1 -3 1.2 ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "names")= chr [1:15] "SCF" "DDF" "Tr" "Ts" ...</span></span>
 <span><span class="co">#&gt;  $ preset_snow_parameters: logi FALSE</span></span>
 <span><span class="co">#&gt;  $ cal_fn                : chr "steepest_descent"</span></span>
 <span><span class="co">#&gt;  $ error_crit_transfo    : chr "KGE__none"</span></span>
-<span><span class="co">#&gt;  $ error_crit_val        : num 0.822</span></span>
+<span><span class="co">#&gt;  $ error_crit_val        : num 0.816</span></span>
 <span><span class="co">#&gt;  $ cal_maximize          : logi TRUE</span></span>
 <span><span class="co">#&gt;  $ do_transfo_param      : logi TRUE</span></span>
-<span><span class="co">#&gt;  $ duration              : 'difftime' num 23.584</span></span>
+<span><span class="co">#&gt;  $ duration              : 'difftime' num 10.661</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "units")= chr "secs"</span></span>
 <span><span class="co">#&gt;  $ cal_par               :List of 7</span></span>
 <span><span class="co">#&gt;   ..$ lower          : Named num [1:15] 0.9 0 1 -3 -2 0 0 0 0 2 ...</span></span>
@@ -213,15 +220,15 @@ function.</p>
 <span><span class="co">#&gt;   .. .. ..$ maxit     : num 50</span></span>
 <span><span class="co">#&gt;   .. .. ..$ reltol    : num 1e-10</span></span>
 <span><span class="co">#&gt;  $ more_info             :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ ParamFinalR  : num [1:15] 0.939 0.155 0.1 0 0.251 ...</span></span>
-<span><span class="co">#&gt;   ..$ CritFinal    : num -0.822</span></span>
-<span><span class="co">#&gt;   ..$ NIter        : num 62</span></span>
-<span><span class="co">#&gt;   ..$ NRuns        : num 1417</span></span>
-<span><span class="co">#&gt;   ..$ HistParamR   : num [1:62, 1:15] 0.819 0.819 0.819 0.819 0.819 ...</span></span>
+<span><span class="co">#&gt;   ..$ ParamFinalR  : num [1:15] 0.879 0.231 0 0 0.8 ...</span></span>
+<span><span class="co">#&gt;   ..$ CritFinal    : num -0.816</span></span>
+<span><span class="co">#&gt;   ..$ NIter        : num 42</span></span>
+<span><span class="co">#&gt;   ..$ NRuns        : num 1026</span></span>
+<span><span class="co">#&gt;   ..$ HistParamR   : num [1:42, 1:15] 0.469 0.469 0.469 0.469 0.469 ...</span></span>
 <span><span class="co">#&gt;   .. ..- attr(*, "dimnames")=List of 2</span></span>
 <span><span class="co">#&gt;   .. .. ..$ : NULL</span></span>
 <span><span class="co">#&gt;   .. .. ..$ : chr [1:15] "Param1" "Param2" "Param3" "Param4" ...</span></span>
-<span><span class="co">#&gt;   ..$ HistCrit     : num [1:62, 1] -0.782 -0.787 -0.79 -0.792 -0.794 ...</span></span>
+<span><span class="co">#&gt;   ..$ HistCrit     : num [1:42, 1] -0.765 -0.778 -0.789 -0.792 -0.793 ...</span></span>
 <span><span class="co">#&gt;   ..$ CritName     : chr "KGE_none"</span></span>
 <span><span class="co">#&gt;   ..$ CritBestValue: NULL</span></span></code></pre></div>
 <p>Simulate model, similar to
@@ -234,12 +241,12 @@ calibrated parameters.</p>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">snow_module</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    </span>
 <span>    <span class="co"># create input</span></span>
-<span>    <span class="va">snow_input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_input.html">create_input</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">minimum_input</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">snow_input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_input.html">create_input</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">minimum_input</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>    </span>
 <span>    <span class="co"># simulate snow</span></span>
-<span>    <span class="va">snow_module_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_snow.html">simulate_snow</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">snow_param</span>, <span class="va">snow_input</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="va">snow_module_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_snow.html">simulate_snow</a></span><span class="op">(</span><span class="va">snow_module</span>, <span class="va">snow_param</span>, <span class="va">snow_input</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
 <span>    </span>
 <span>    <span class="co"># update precip</span></span>
 <span>    <span class="va">input</span><span class="op">$</span><span class="va">P</span> <span class="op">&lt;-</span> <span class="va">snow_module_results</span><span class="op">$</span><span class="va">surface_water_runoff</span></span>
@@ -281,11 +288,11 @@ and validation period separately.</p>
 <code class="sourceCode R"><span><span class="co"># airGR plots for validation and calibration time period</span></span>
 <span></span>
 <span><span class="co"># calibration period</span></span>
-<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_cal.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_cal</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_cal.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_cal</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># validation period</span></span>
-<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_val.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_val</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/save_airGR_plot.html">save_airGR_plot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output_folder</span>, <span class="st">"airGR_val.pdf"</span><span class="op">)</span>, <span class="va">model</span>, <span class="va">sim</span>, <span class="va">split_indices</span><span class="op">$</span><span class="va">ind_val</span>, <span class="va">hydro_data</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">suppressMessages</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Here is the validation plot shown:</p>
 <p><img src="figures/airGR_val.png"></p>
 <p>It seems that this model has difficulties in spring with snow melt,
@@ -354,7 +361,7 @@ transformation is used …</p>
 <td align="left">KGE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.8030378</td>
+<td align="right">0.7918493</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -362,7 +369,7 @@ transformation is used …</p>
 <td align="left">NSE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.6289963</td>
+<td align="right">0.5978796</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -370,7 +377,7 @@ transformation is used …</p>
 <td align="left">VE</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">0.5894536</td>
+<td align="right">0.5677868</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -378,7 +385,7 @@ transformation is used …</p>
 <td align="left">pbias</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">2.5000000</td>
+<td align="right">3.5000000</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -386,7 +393,7 @@ transformation is used …</p>
 <td align="left">mae</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">1.8554132</td>
+<td align="right">1.9533335</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
@@ -394,7 +401,7 @@ transformation is used …</p>
 <td align="left">mse</td>
 <td align="left">none</td>
 <td align="left">NA</td>
-<td align="right">9.4142184</td>
+<td align="right">10.2038044</td>
 <td align="left">spring</td>
 <td align="left">calibration</td>
 </tr>
