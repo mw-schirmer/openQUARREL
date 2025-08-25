@@ -1,6 +1,6 @@
 Package: openQUARREL
 Title: A Meta-Package Integrating Several Hydrological Model Packages in R
-Version: 1.0.1
+Version: 1.1.0
 Authors@R:
     c(
     person(given = "Michael",
