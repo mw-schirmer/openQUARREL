@@ -5,4 +5,6 @@
 .Ruserdata
 man/
 docs
+!docs/openQUARREL_manual.pdf
+!docs/Vignettes_Combined.pdf
 inst/doc
