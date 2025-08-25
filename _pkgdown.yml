@@ -17,7 +17,6 @@ articles:
   - calibration_methods_overview
   - calibrate_validate
 extra_files:
-  - inst/pkg_extra/openQUARREL_manual.pdf
-  - inst/pkg_extra/Vignettes_Combined.pdf
-
+- inst/pkg_extra/openQUARREL_manual.pdf
+- inst/pkg_extra/Vignettes_Combined.pdf
 
