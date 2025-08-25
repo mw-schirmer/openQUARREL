@@ -3,10 +3,10 @@ template:
   bootstrap: 5
 navbar:
   right:
-    - text: "Manual (PDF)"
-      href: "openQUARREL_manual.pdf"
-    - text: "Vignettes (PDF)"
-      href: "Vignettes_Combined.pdf"
+  - text: Manual (PDF)
+    href: openQUARREL_manual.pdf
+  - text: Vignettes (PDF)
+    href: Vignettes_Combined.pdf
 articles:
 - title: Articles
   navbar: ~
@@ -16,3 +16,4 @@ articles:
   - include_snow_module
   - calibration_methods_overview
   - calibrate_validate
+
